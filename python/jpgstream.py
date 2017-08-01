@@ -23,6 +23,8 @@ import time
 import serial
 import cv2
 
+from helpers import *
+
 # Modifiable params --------------------------------------------------------------------
 
 PORT = '/dev/ttyACM0' # Ubuntu
@@ -30,15 +32,6 @@ PORT = '/dev/ttyACM0' # Ubuntu
 
 #BAUD = 115200  # Arduino Due
 BAUD = 921600   # Arduino Uno
-
-
-# Helpers ------------------------------------------------------------------------------
-
-def ackcheck(port, msg):
-    assert(msg in port.readline().decode())
-
-def sendbyte(port, value):
-    port.write(bytearray([value]))
 
 # main ------------------------------------------------------------------------------
 

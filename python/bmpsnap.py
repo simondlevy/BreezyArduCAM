@@ -22,27 +22,14 @@ import time
 import serial
 from sys import stdout
 
+from helpers import *
+
 # Modifiable params --------------------------------------------------------------------
 
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
 BAUD = 921600   # Arduino Uno
-
-# helpers ---------------------------------------------------------------------------
-
-def getack(port):
-    stdout.write(port.readline().decode())
-
-def sendbyte(port, value):
-    port.write(bytearray([value]))
-
-def sendwithack(port, value):
-    sendbyte(port, value)
-    getack(port)
-
-def ackcheck(port, msg):
-    assert(msg in port.readline().decode())
 
 # main ------------------------------------------------------------------------------
 
