@@ -1,6 +1,6 @@
   
 #include <Wire.h>
-#include <ArduCAM.h>
+#include <BreezyArduCAM.h>
 #include <SPI.h>
 
 #define BMPIMAGEOFFSET 66
