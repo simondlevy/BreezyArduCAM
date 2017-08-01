@@ -29,16 +29,6 @@ PORT = '/dev/ttyACM0' # Ubuntu
 
 BAUD = 921600   # Arduino Uno
 
-#SIZE = 0  # 160x120
-#SIZE = 1  # 176x144
-SIZE = 2  # 320x240
-#SIZE = 3  # 352x288
-#SIZE = 4  # 640x480
-#SIZE = 5  # 800x600
-#SIZE = 6  # 1024x768
-#SIZE = 7  # 1280x960
-#SIZE = 8  # 1600x1200
-
 # helpers ---------------------------------------------------------------------------
 
 def getack(port):
@@ -61,13 +51,9 @@ if __name__ == '__main__':
     # Validate startup messages
     getack(port)
     getack(port)
-    getack(port)
 
     # Wait a spell
     time.sleep(0.2)
-
-    # Request BMP data
-    #sendwithack(port, 0x31)
 
     # Request single-frame capture
     sendwithack(port, 0x30);

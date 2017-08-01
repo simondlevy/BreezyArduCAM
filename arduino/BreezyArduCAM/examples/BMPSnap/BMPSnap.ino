@@ -46,40 +46,23 @@ void setup(void)
     // Talk to Arduino at fastest possible baud rate
     Serial.begin(921600);
 
-    uint8_t vid, pid;
-    uint8_t temp;
-
-    Serial.println(F("ACK CMD ArduCAM Start!"));
+    Serial.println("ACK CMD ArduCAM Start!");
 
     //Check if the ArduCAM SPI bus is OK
     while(true) {
         myCam.write_reg(ARDUCHIP_TEST1, 0x55);
-        temp = myCam.read_reg(ARDUCHIP_TEST1);
+        uint8_t temp = myCam.read_reg(ARDUCHIP_TEST1);
         if (temp != 0x55){
-            Serial.println(F("ACK CMD SPI interface Error!"));
+            Serial.println("ACK CMD SPI interface Error!");
             delay(1000);continue;
         }else{
-            Serial.println(F("ACK CMD SPI interface OK."));break;
+            Serial.println("ACK CMD SPI interface OK.");break;
         }
-    }
-
-    while(true) {
-        //Check if the camera module type is OV2640
-        myCam.wrSensorReg8_8(0xff, 0x01);
-        myCam.rdSensorReg8_8(OV2640_CHIPID_HIGH, &vid);
-        myCam.rdSensorReg8_8(OV2640_CHIPID_LOW, &pid);
-        if ((vid != 0x26 ) && (( pid != 0x41 ) || ( pid != 0x42 ))){
-            Serial.println(F("ACK CMD Can't find OV2640 module!"));
-            delay(1000);continue;
-        }
-        else{
-            Serial.println(F("ACK CMD OV2640 detected."));break;
-        } 
     }
 
     //Change to BMP capture mode and initialize the OV5642 module
     myCam.initBmp();
-    Serial.println(F("ACK CMD CAM set format BMP"));
+    Serial.println("ACK CMD CAM set format BMP");
 }
 
 void loop(void) 
@@ -93,7 +76,7 @@ void loop(void)
             case 0x30:
                 ready = true;
                 capturing = true;
-                Serial.println(F("ACK CMD CAM start single shoot"));
+                Serial.println("ACK CMD CAM start single shoot");
                 break;
             case 0x31:
                 break;
