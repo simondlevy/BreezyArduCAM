@@ -58,10 +58,7 @@ if __name__ == '__main__':
     time.sleep(0.2)
 
     # Request single-frame capture
-    sendbyte(port, 0x30)
-
-    # Get capture-done message
-    getack(port)
+    sendwithack(port, 0x30)
 
     stdout.write('Writing file ...')
     stdout.flush()
