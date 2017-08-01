@@ -50,13 +50,13 @@ if __name__ == '__main__':
 
     # Validate startup messages
     getack(port)
-    #getack(port)
 
     # Wait a spell
     time.sleep(0.2)
 
     # Request single-frame capture
-    sendwithack(port, 0x30);
+    sendbyte(port, 0x30)
+    #sendwithack(port, 0x30);
 
     # Get capture-done message
     getack(port)
