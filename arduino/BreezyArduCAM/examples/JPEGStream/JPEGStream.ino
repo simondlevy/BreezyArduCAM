@@ -40,9 +40,6 @@ void setup(void)
     myCam.initJpeg();
 
     myCam.OV2640_set_JPEG_size(OV2640_320x240);
-
-    delay(1000);
-    myCam.clear_fifo_flag();
 }
 
 void loop(void) 
