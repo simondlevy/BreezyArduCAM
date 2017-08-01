@@ -33,11 +33,6 @@ void setup(void)
 
     Wire.begin();
     Serial.begin(921600);
-
-    // set the CS as an output
-    pinMode(CS, OUTPUT);
-
-    // initialize SPI
     SPI.begin();
 
     while (true) {

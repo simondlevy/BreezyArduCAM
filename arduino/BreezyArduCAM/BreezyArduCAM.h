@@ -21,11 +21,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef BreezyArduCAM_H
 #define BreezyArduCAM_H
 
-#include "memorysaver.h"
-
-#include "Arduino.h"
-#include <pins_arduino.h>
-#include "memorysaver.h"
+#include <Arduino.h>
 
 #if defined (__AVR__)
 #define cbi(reg, bitmask) *reg &= ~bitmask
