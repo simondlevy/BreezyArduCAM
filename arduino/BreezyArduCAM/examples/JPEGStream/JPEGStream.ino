@@ -47,7 +47,7 @@ void loop(void)
     static bool start_capture;
     static bool capturing;
 
-    if (Serial.available() && Serial.read() == 0x20) {
+    if (Serial.available() && Serial.read() == 1) {
         capturing = true;
         temp = 0xff;
         start_capture = true;
@@ -58,7 +58,7 @@ void loop(void)
         while (true) {
 
             // Check for halt-capture command
-            if (Serial.available() && Serial.read() == 0x21) {
+            if (Serial.available() && Serial.read() == 0) {
                 start_capture = false;
                 capturing = false;
                 break;

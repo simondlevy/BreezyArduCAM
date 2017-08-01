@@ -31,15 +31,6 @@ PORT = '/dev/ttyACM0' # Ubuntu
 #BAUD = 115200  # Arduino Due
 BAUD = 921600   # Arduino Uno
 
-#SIZE = 0  # 160x120
-#SIZE = 1  # 176x144
-SIZE = 2  # 320x240
-#SIZE = 3  # 352x288
-#SIZE = 4  # 640x480
-#SIZE = 5  # 800x600
-#SIZE = 6  # 1024x768
-#SIZE = 7  # 1280x960
-#SIZE = 8  # 1600x1200
 
 # Helpers ------------------------------------------------------------------------------
 
@@ -62,8 +53,8 @@ if __name__ == '__main__':
     # Wait a spell
     time.sleep(0.2)
 
-    # Request continuous read
-    sendbyte(port, 0x20)
+    # Send start flag
+    sendbyte(port, 1)
 
     # We'll report frames-per-second
     start = time.time()
@@ -117,5 +108,5 @@ if __name__ == '__main__':
     # Close the window
     cv2.destroyAllWindows()
 
-    # End continuous read
-    port.write(bytearray([0x21]))
+    # Send stop flag
+    sendbyte(0)
