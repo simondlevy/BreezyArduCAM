@@ -48,7 +48,7 @@ void setup(void)
 
     //Change to BMP capture mode and initialize the OV5642 module
     myCam.initBmp();
-    Serial.println("ACK CMD CAM set format BMP");
+    //Serial.println("ACK CMD CAM set format BMP");
 }
 
 void loop(void) 

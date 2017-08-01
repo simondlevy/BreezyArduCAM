@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     # Validate startup messages
     getack(port)
-    getack(port)
+    #getack(port)
 
     # Wait a spell
     time.sleep(0.2)
