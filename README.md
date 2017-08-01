@@ -1,6 +1,6 @@
 # A simple Arduino API for ArduCAM Mini
 
-<img src="arducam.png" width=200>
+<img src="image.png" width=200>
 
 This repository contains an Arduino library and examples for the popular ArduCAM Mini camera. 
 I've taken the code in the original ArduCAM Arduino [repository](https://github.com/ArduCAM/Arduino) 
