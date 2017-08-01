@@ -83,19 +83,19 @@ void loop(void)
 
         if (myCam.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
         {
-            Serial.println(F("ACK CMD CAM Capture Done."));
+            Serial.println("ACK CMD CAM Capture Done.");
             uint8_t temp;
             uint32_t length = 0;
             length = myCam.read_fifo_length();
             if (length >= MAX_FIFO_SIZE ) 
             {
-                Serial.println(F("ACK CMD Over size."));
+                Serial.println("ACK CMD Over size.");
                 myCam.clear_fifo_flag();
                 return;
             }
             if (length == 0 ) //0 kb
             {
-                Serial.println(F("ACK CMD Size is 0."));
+                Serial.println("ACK CMD Size is 0.");
                 myCam.clear_fifo_flag();
                 return;
             }
