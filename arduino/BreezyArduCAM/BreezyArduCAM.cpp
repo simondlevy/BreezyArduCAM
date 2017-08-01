@@ -71,7 +71,7 @@ void ArduCAM_Mini_2MP::init()
     delay(100);
 }
 
-void ArduCAM_Mini_2MP::initBmp(void)
+void ArduCAM_Mini_2MP::initQvga(void)
 {
     init();
 

@@ -159,7 +159,7 @@ class ArduCAM_Mini_2MP
 
         ArduCAM_Mini_2MP(int CS);
 
-        void initBmp();
+        void initQvga();
 
         void initJpeg160x120(void);
         void initJpeg176x144(void);
