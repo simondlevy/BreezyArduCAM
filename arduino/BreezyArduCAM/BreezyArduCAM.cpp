@@ -38,7 +38,6 @@ enum {
     OV2640_1024x768,	
     OV2640_1280x1024,
     OV2640_1600x1200
-
 };
 
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
@@ -88,14 +87,53 @@ void ArduCAM_Mini_2MP::initJpeg(uint8_t size)
     wrSensorRegs8_8(OV2640_JPEG);
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x15, 0x00);
-    wrSensorRegs8_8(OV2640_320x240_JPEG);
 
     OV2640_set_JPEG_size(size);
+}
+
+void ArduCAM_Mini_2MP::initJpeg160x120(void)
+{
+    initJpeg(OV2640_160x120);
+}
+
+void ArduCAM_Mini_2MP::initJpeg176x144(void)
+{
+    initJpeg(OV2640_176x144);
 }
 
 void ArduCAM_Mini_2MP::initJpeg320x240(void)
 {
     initJpeg(OV2640_320x240);
+}
+
+void ArduCAM_Mini_2MP::initJpeg352x288(void)
+{
+    initJpeg(OV2640_352x288);
+}
+
+void ArduCAM_Mini_2MP::initJpeg640x480(void)
+{
+    initJpeg(OV2640_640x480);
+}
+
+void ArduCAM_Mini_2MP::initJpeg800x600(void)
+{
+    initJpeg(OV2640_800x600);
+}
+
+void ArduCAM_Mini_2MP::initJpeg1024x768(void)
+{
+    initJpeg(OV2640_1024x768);
+}
+
+void ArduCAM_Mini_2MP::initJpeg1280x1024(void)
+{
+    initJpeg(OV2640_1280x1024);
+}
+
+void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
+{
+    initJpeg(OV2640_1600x1200);
 }
 
 void ArduCAM_Mini_2MP::flush_fifo(void)

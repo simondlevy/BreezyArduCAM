@@ -23,7 +23,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <SPI.h>
 
 static const int CS = 10;
-static bool start_capture;
 
 ArduCAM_Mini_2MP myCam(CS);
 
@@ -36,14 +35,16 @@ void setup(void)
     // Talk to Arduino at fastest possible baud rate
     Serial.begin(921600);
 
-    // Change to JPEG capture mode and initialize the OV5642 module
-    myCam.initJpeg320x240();
+    // Start the camera in JPEG mode with a specific image size
+    myCam.initJpeg640x480();
 }
 
 void loop(void) 
 {
     uint8_t temp = 0xff, temp_last = 0;
     bool is_header = false;
+
+    static bool start_capture;
     static bool capturing;
 
     if (Serial.available() && Serial.read() == 0x20) {
