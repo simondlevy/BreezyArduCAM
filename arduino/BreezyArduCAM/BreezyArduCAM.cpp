@@ -18,12 +18,11 @@ You should have received a copy of the GNU General Public License
 along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "memorysaver.h"
-#include "Arduino.h"
 #include "BreezyArduCAM.h"
+
 #include <Wire.h>
 #include <SPI.h>
-#include "HardwareSerial.h"
+
 #if defined(__SAM3X8E__)
 #define Wire Wire1
 #endif
