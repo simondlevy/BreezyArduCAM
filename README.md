@@ -1,5 +1,7 @@
 # A simple Arduino API for ArduCAM Mini
 
+<img src="arducam.jpg">
+
 This repository contains an Arduino library and examples for the popular ArduCAM Mini camera. 
 I've taken the code in the original ArduCAM Arduino [repository](https://github.com/ArduCAM/Arduino) 
 and simplified the API, so you can write new applications in a minimal amount of code.  Each example
