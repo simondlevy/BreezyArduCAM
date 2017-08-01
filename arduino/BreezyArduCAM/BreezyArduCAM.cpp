@@ -27,6 +27,19 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define Wire Wire1
 #endif
 
+enum {
+
+    OV2640_160x120, 		
+    OV2640_176x144, 		
+    OV2640_320x240, 	
+    OV2640_352x288,	
+    OV2640_640x480,	
+    OV2640_800x600, 	
+    OV2640_1024x768,	
+    OV2640_1280x1024,
+    OV2640_1600x1200
+
+};
 
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
 {
