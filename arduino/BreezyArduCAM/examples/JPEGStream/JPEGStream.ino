@@ -1,16 +1,3 @@
-// ArduCAM Mini demo (C)2017 Lee
-// Web: http://www.ArduCAM.com
-// This program is a demo of how to use most of the functions
-// of the library with ArduCAM Mini camera, and can run on any Arduino platform.
-// This demo was made for ArduCAM_Mini_5MP_Plus.
-// It needs to be used in combination with PC software.
-// It can take photo continuously as video streaming.
-//
-// The demo sketch will do the following tasks:
-// 1. Set the camera to JPEG output mode.
-// 2. Read data from Serial port and deal with it
-// 3. If receive 0x20,camera will capture JPEG photo and write datas continuously.Stop when receive 0x21.
-
 #include <Wire.h>
 #include <BreezyArduCAM.h>
 #include <SPI.h>
@@ -18,7 +5,7 @@
 static const int CS = 10;
 static bool start_capture;
 
-ArduCAM myCam(CS);
+ArduCAM_Mini_2MP myCam(CS);
 
 void setup(void) 
 {

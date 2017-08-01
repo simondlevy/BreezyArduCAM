@@ -1,2 +1,3 @@
-python/*.jpg
-python/*.bmp
+*.swp
+*.jpg
+*.bmp

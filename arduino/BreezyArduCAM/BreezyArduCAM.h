@@ -1,46 +1,3 @@
-/*
-  ArduCAM.h - Arduino library support for CMOS Image Sensor
-  Copyright (C)2011-2015 ArduCAM.com. All right reserved
-  
-  Basic functionality of this library are based on the demo-code provided by
-  ArduCAM.com. You can find the latest version of the library at
-  http://www.ArduCAM.com
-
-  Now supported controllers:
-		- OV2640
-				
-	We will add support for many other sensors in next release.
-	
-  Supported MCU platform
- 		-	Theoretically support all Arduino families
-  		-	Arduino UNO R3			(Tested)
-  		-	Arduino MEGA2560 R3		(Tested)
-  		-	Arduino Leonardo R3		(Tested)
-  		-	Arduino Nano			(Tested)
-  		-	Arduino DUE				(Tested)
-  		-   Arduino Yun				(Tested)  		
-  		-	Raspberry Pi			(Tested)
-  		-   ESP8266-12				(Tested)  		
-
-  If you make any modifications or improvements to the code, I would appreciate
-  that you share the code with me so that I might include it in the next release.
-  I can be contacted through http://www.ArduCAM.com
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
 #ifndef ArduCAM_H
 #define ArduCAM_H
 
@@ -49,14 +6,6 @@
 #include "Arduino.h"
 #include <pins_arduino.h>
 #include "memorysaver.h"
-
-// sdl
-#if defined(STM32_H)
-#define cbi(reg, bitmask) *reg &= ~bitmask
-#define sbi(reg, bitmask) *reg |= bitmask
-#define regtype volatile uint32_t
-#define regsize uint32_t
-#endif
 
 #if defined (__AVR__)
 #define cbi(reg, bitmask) *reg &= ~bitmask
@@ -202,11 +151,11 @@ struct sensor_reg {
 /* define a structure for sensor register initialization values */
 /****************************************************************/
 
-class ArduCAM 
+class ArduCAM_Mini_2MP
 {
     public:
 
-        ArduCAM(int CS);
+        ArduCAM_Mini_2MP(int CS);
         void initBmp();
         void initJpeg();
 

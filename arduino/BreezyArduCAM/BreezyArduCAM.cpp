@@ -9,7 +9,7 @@
 #endif
 
 
-ArduCAM::ArduCAM(int CS)
+ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
 {
     P_CS  = portOutputRegister(digitalPinToPort(CS));
     B_CS  = digitalPinToBitMask(CS);
@@ -19,21 +19,21 @@ ArduCAM::ArduCAM(int CS)
     sensor_addr = 0x60;
 }
 
-void ArduCAM::init()
+void ArduCAM_Mini_2MP::init()
 {
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x12, 0x80);
     delay(100);
 }
 
-void ArduCAM::initBmp(void)
+void ArduCAM_Mini_2MP::initBmp(void)
 {
     init();
 
     wrSensorRegs8_8(OV2640_QVGA);
 }
 
-void ArduCAM::initJpeg(void)
+void ArduCAM_Mini_2MP::initJpeg(void)
 {
     init();
 
@@ -45,22 +45,22 @@ void ArduCAM::initJpeg(void)
     wrSensorRegs8_8(OV2640_320x240_JPEG);
 }
 
-void ArduCAM::flush_fifo(void)
+void ArduCAM_Mini_2MP::flush_fifo(void)
 {
     write_reg(ARDUCHIP_FIFO, FIFO_CLEAR_MASK);
 }
 
-void ArduCAM::start_capture(void)
+void ArduCAM_Mini_2MP::start_capture(void)
 {
     write_reg(ARDUCHIP_FIFO, FIFO_START_MASK);
 }
 
-void ArduCAM::clear_fifo_flag(void )
+void ArduCAM_Mini_2MP::clear_fifo_flag(void )
 {
     write_reg(ARDUCHIP_FIFO, FIFO_CLEAR_MASK);
 }
 
-uint32_t ArduCAM::read_fifo_length(void)
+uint32_t ArduCAM_Mini_2MP::read_fifo_length(void)
 {
     uint32_t len1,len2,len3,length=0;
     len1 = read_reg(FIFO_SIZE1);
@@ -70,48 +70,48 @@ uint32_t ArduCAM::read_fifo_length(void)
     return length;	
 }
 
-void ArduCAM::set_fifo_burst()
+void ArduCAM_Mini_2MP::set_fifo_burst()
 {
     SPI.transfer(BURST_FIFO_READ);
 }
 
-void ArduCAM::CS_HIGH(void)
+void ArduCAM_Mini_2MP::CS_HIGH(void)
 {
     sbi(P_CS, B_CS);	
 }
-void ArduCAM::CS_LOW(void)
+void ArduCAM_Mini_2MP::CS_LOW(void)
 {
     cbi(P_CS, B_CS);	
 }
 
-uint8_t ArduCAM::read_fifo(void)
+uint8_t ArduCAM_Mini_2MP::read_fifo(void)
 {
     uint8_t data;
     data = bus_read(SINGLE_FIFO_READ);
     return data;
 }
 
-uint8_t ArduCAM::read_reg(uint8_t addr)
+uint8_t ArduCAM_Mini_2MP::read_reg(uint8_t addr)
 {
     uint8_t data;
     data = bus_read(addr & 0x7F);
     return data;
 }
 
-void ArduCAM::write_reg(uint8_t addr, uint8_t data)
+void ArduCAM_Mini_2MP::write_reg(uint8_t addr, uint8_t data)
 {
     bus_write(addr | 0x80, data);
 }
 
 //Set corresponding bit  
-void ArduCAM::set_bit(uint8_t addr, uint8_t bit)
+void ArduCAM_Mini_2MP::set_bit(uint8_t addr, uint8_t bit)
 {
     uint8_t temp;
     temp = read_reg(addr);
     write_reg(addr, temp | bit);
 }
 //Clear corresponding bit 
-void ArduCAM::clear_bit(uint8_t addr, uint8_t bit)
+void ArduCAM_Mini_2MP::clear_bit(uint8_t addr, uint8_t bit)
 {
     uint8_t temp;
     temp = read_reg(addr);
@@ -119,7 +119,7 @@ void ArduCAM::clear_bit(uint8_t addr, uint8_t bit)
 }
 
 //Get corresponding bit status
-uint8_t ArduCAM::get_bit(uint8_t addr, uint8_t bit)
+uint8_t ArduCAM_Mini_2MP::get_bit(uint8_t addr, uint8_t bit)
 {
     uint8_t temp;
     temp = read_reg(addr);
@@ -127,7 +127,7 @@ uint8_t ArduCAM::get_bit(uint8_t addr, uint8_t bit)
     return temp;
 }
 
-uint8_t ArduCAM::bus_write(int address,int value)
+uint8_t ArduCAM_Mini_2MP::bus_write(int address,int value)
 {	
     cbi(P_CS, B_CS);
     SPI.transfer(address);
@@ -136,7 +136,7 @@ uint8_t ArduCAM::bus_write(int address,int value)
     return 1;
 }
 
-uint8_t ArduCAM:: bus_read(int address)
+uint8_t ArduCAM_Mini_2MP:: bus_read(int address)
 {
     uint8_t value;
     cbi(P_CS, B_CS);
@@ -168,7 +168,7 @@ uint8_t ArduCAM:: bus_read(int address)
 
 
 
-void ArduCAM::OV2640_set_JPEG_size(uint8_t size)
+void ArduCAM_Mini_2MP::OV2640_set_JPEG_size(uint8_t size)
 {
     switch(size)
     {
@@ -206,7 +206,7 @@ void ArduCAM::OV2640_set_JPEG_size(uint8_t size)
 }
 
 // Write 8 bit values to 8 bit register address
-int ArduCAM::wrSensorRegs8_8(const struct sensor_reg reglist[])
+int ArduCAM_Mini_2MP::wrSensorRegs8_8(const struct sensor_reg reglist[])
 {
     //int err = 0;
     uint16_t reg_addr = 0;
@@ -223,7 +223,7 @@ int ArduCAM::wrSensorRegs8_8(const struct sensor_reg reglist[])
 }
 
 // Write 16 bit values to 8 bit register address
-int ArduCAM::wrSensorRegs8_16(const struct sensor_reg reglist[])
+int ArduCAM_Mini_2MP::wrSensorRegs8_16(const struct sensor_reg reglist[])
 {
     //int err = 0;
     unsigned int reg_addr=0, reg_val=0;
@@ -242,7 +242,7 @@ int ArduCAM::wrSensorRegs8_16(const struct sensor_reg reglist[])
 }
 
 // Write 8 bit values to 16 bit register address
-int ArduCAM::wrSensorRegs16_8(const struct sensor_reg reglist[])
+int ArduCAM_Mini_2MP::wrSensorRegs16_8(const struct sensor_reg reglist[])
 {
     unsigned int reg_addr=0;
     unsigned char reg_val=0;
@@ -260,7 +260,7 @@ int ArduCAM::wrSensorRegs16_8(const struct sensor_reg reglist[])
 }
 
 //I2C Array Write 16bit address, 16bit data
-int ArduCAM::wrSensorRegs16_16(const struct sensor_reg reglist[])
+int ArduCAM_Mini_2MP::wrSensorRegs16_16(const struct sensor_reg reglist[])
 {
     unsigned int reg_addr, reg_val;
     const struct sensor_reg *next = reglist;
@@ -278,7 +278,7 @@ int ArduCAM::wrSensorRegs16_16(const struct sensor_reg reglist[])
 
 
 // Read/write 8 bit value to/from 8 bit register address	
-byte ArduCAM::wrSensorReg8_8(int regID, int regDat)
+byte ArduCAM_Mini_2MP::wrSensorReg8_8(int regID, int regDat)
 {
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID & 0x00FF);
@@ -291,7 +291,7 @@ byte ArduCAM::wrSensorReg8_8(int regID, int regDat)
     return 1;
 
 }
-byte ArduCAM::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
+byte ArduCAM_Mini_2MP::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
 {	
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID & 0x00FF);
@@ -305,7 +305,7 @@ byte ArduCAM::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
 
 }
 // Read/write 16 bit value to/from 8 bit register address
-byte ArduCAM::wrSensorReg8_16(int regID, int regDat)
+byte ArduCAM_Mini_2MP::wrSensorReg8_16(int regID, int regDat)
 {
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID & 0x00FF);
@@ -319,7 +319,7 @@ byte ArduCAM::wrSensorReg8_16(int regID, int regDat)
     delay(1);
     return 1;
 }
-byte ArduCAM::rdSensorReg8_16(uint8_t regID, uint16_t* regDat)
+byte ArduCAM_Mini_2MP::rdSensorReg8_16(uint8_t regID, uint16_t* regDat)
 {
     uint8_t temp;
     Wire.beginTransmission(sensor_addr >> 1);
@@ -337,7 +337,7 @@ byte ArduCAM::rdSensorReg8_16(uint8_t regID, uint16_t* regDat)
 }
 
 // Read/write 8 bit value to/from 16 bit register address
-byte ArduCAM::wrSensorReg16_8(int regID, int regDat)
+byte ArduCAM_Mini_2MP::wrSensorReg16_8(int regID, int regDat)
 {
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID >> 8);            // sends instruction byte, MSB first
@@ -350,7 +350,7 @@ byte ArduCAM::wrSensorReg16_8(int regID, int regDat)
     delay(1);
     return 1;
 }
-byte ArduCAM::rdSensorReg16_8(uint16_t regID, uint8_t* regDat)
+byte ArduCAM_Mini_2MP::rdSensorReg16_8(uint16_t regID, uint8_t* regDat)
 {
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID >> 8);
@@ -366,7 +366,7 @@ byte ArduCAM::rdSensorReg16_8(uint16_t regID, uint8_t* regDat)
 }
 
 //I2C Write 16bit address, 16bit data
-byte ArduCAM::wrSensorReg16_16(int regID, int regDat)
+byte ArduCAM_Mini_2MP::wrSensorReg16_16(int regID, int regDat)
 {
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID >> 8);            // sends instruction byte, MSB first
@@ -382,7 +382,7 @@ byte ArduCAM::wrSensorReg16_16(int regID, int regDat)
 }
 
 //I2C Read 16bit address, 16bit data
-byte ArduCAM::rdSensorReg16_16(uint16_t regID, uint16_t* regDat)
+byte ArduCAM_Mini_2MP::rdSensorReg16_16(uint16_t regID, uint16_t* regDat)
 {
     uint16_t temp;
     Wire.beginTransmission(sensor_addr >> 1);

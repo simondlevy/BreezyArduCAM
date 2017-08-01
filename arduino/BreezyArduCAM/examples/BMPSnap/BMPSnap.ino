@@ -16,7 +16,7 @@ const unsigned char bmp_header[BMPIMAGEOFFSET] PROGMEM =
 // set pin 10 as the slave select for the digital pot:
 static const int CS = 10;
 
-ArduCAM myCam(CS);
+ArduCAM_Mini_2MP myCam(CS);
 
 void setup(void) 
 {
