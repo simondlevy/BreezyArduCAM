@@ -40,6 +40,20 @@ ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
 
 void ArduCAM_Mini_2MP::init()
 {
+    // Check if the ArduCAM SPI bus is OK
+    while (true) {
+        write_reg(ARDUCHIP_TEST1, 0x55);
+        uint8_t temp = read_reg(ARDUCHIP_TEST1);
+        if (temp != 0x55) {
+            Serial.println("ACK CMD SPI interface Error!");
+            delay(1000);
+            continue;
+        } else{
+            Serial.println("ACK CMD SPI interface OK.");
+            break;
+        }
+    }
+
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x12, 0x80);
     delay(100);

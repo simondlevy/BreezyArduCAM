@@ -36,20 +36,6 @@ void setup(void)
     // Talk to Arduino at fastest possible baud rate
     Serial.begin(921600);
 
-    //Check if the ArduCAM SPI bus is OK
-    while (true) {
-        myCam.write_reg(ARDUCHIP_TEST1, 0x55);
-        uint8_t temp = myCam.read_reg(ARDUCHIP_TEST1);
-        if (temp != 0x55) {
-            Serial.println("ACK CMD SPI interface Error!");
-            delay(1000);
-            continue;
-        } else{
-            Serial.println("ACK CMD SPI interface OK.");
-            break;
-        }
-    }
-
     // Change to JPEG capture mode and initialize the OV5642 module
     myCam.initJpeg();
 
