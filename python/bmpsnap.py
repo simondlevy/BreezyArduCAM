@@ -60,7 +60,6 @@ if __name__ == '__main__':
 
     # Get capture-done message
     getack(port)
-    getack(port)
 
     stdout.write('Writing file ...')
     stdout.flush()

@@ -46,8 +46,6 @@ void setup(void)
     // Talk to Arduino at fastest possible baud rate
     Serial.begin(921600);
 
-    Serial.println("ACK CMD ArduCAM Start!");
-
     //Change to BMP capture mode and initialize the OV5642 module
     myCam.initBmp();
     Serial.println("ACK CMD CAM set format BMP");
