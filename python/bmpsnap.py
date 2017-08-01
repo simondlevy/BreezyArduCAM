@@ -41,6 +41,9 @@ def sendwithack(port, value):
     sendbyte(port, value)
     getack(port)
 
+def ackcheck(port, msg):
+    assert(msg in port.readline().decode())
+
 # main ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
@@ -48,15 +51,14 @@ if __name__ == '__main__':
     # Open connection to Arduino
     port = serial.Serial(PORT, BAUD, timeout=2)
 
-    # Validate startup messages
-    getack(port)
+    # Validate startup message
+    ackcheck(port, 'SPI interface OK.')
 
     # Wait a spell
     time.sleep(0.2)
 
     # Request single-frame capture
     sendbyte(port, 0x30)
-    #sendwithack(port, 0x30);
 
     # Get capture-done message
     getack(port)

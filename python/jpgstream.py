@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # Open connection to Arduino
     port = serial.Serial(PORT, BAUD)
 
-    # Validate startup messages
+    # Validate startup message
     ackcheck(port, 'SPI interface OK.')
 
     # Wait a spell

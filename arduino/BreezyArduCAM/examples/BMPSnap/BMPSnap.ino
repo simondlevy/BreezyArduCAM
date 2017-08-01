@@ -61,7 +61,6 @@ void loop(void)
             case 0x30:
                 ready = true;
                 capturing = true;
-                //Serial.println("ACK CMD CAM start single shoot");
                 break;
             case 0x31:
                 break;
