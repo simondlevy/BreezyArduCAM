@@ -29,16 +29,17 @@ ArduCAM_Mini_2MP myCam(CS);
 
 void setup(void) 
 {
-    uint8_t temp;
-
+    // ArduCAM Mini uses both I^2C and SPI buses
     Wire.begin();
-    Serial.begin(921600);
     SPI.begin();
 
+    // Talk to Arduino at fastest possible baud rate
+    Serial.begin(921600);
+
+    //Check if the ArduCAM SPI bus is OK
     while (true) {
-        //Check if the ArduCAM SPI bus is OK
         myCam.write_reg(ARDUCHIP_TEST1, 0x55);
-        temp = myCam.read_reg(ARDUCHIP_TEST1);
+        uint8_t temp = myCam.read_reg(ARDUCHIP_TEST1);
         if (temp != 0x55) {
             Serial.println("ACK CMD SPI interface Error!");
             delay(1000);
