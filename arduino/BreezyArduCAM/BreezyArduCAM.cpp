@@ -66,7 +66,7 @@ void ArduCAM_Mini_2MP::initBmp(void)
     wrSensorRegs8_8(OV2640_QVGA);
 }
 
-void ArduCAM_Mini_2MP::initJpeg(void)
+void ArduCAM_Mini_2MP::initJpeg(uint8_t size)
 {
     init();
 
@@ -76,6 +76,13 @@ void ArduCAM_Mini_2MP::initJpeg(void)
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x15, 0x00);
     wrSensorRegs8_8(OV2640_320x240_JPEG);
+
+    OV2640_set_JPEG_size(size);
+}
+
+void ArduCAM_Mini_2MP::initJpeg320x240(void)
+{
+    initJpeg(OV2640_320x240);
 }
 
 void ArduCAM_Mini_2MP::flush_fifo(void)

@@ -172,8 +172,10 @@ class ArduCAM_Mini_2MP
     public:
 
         ArduCAM_Mini_2MP(int CS);
+
         void initBmp();
-        void initJpeg();
+
+        void initJpeg320x240();
 
         void CS_HIGH(void);
         void CS_LOW(void);
@@ -233,6 +235,8 @@ class ArduCAM_Mini_2MP
     private:
 
         void init();
+
+        void initJpeg(uint8_t size);
 
         regtype *P_CS;
         regsize B_CS;

@@ -37,9 +37,7 @@ void setup(void)
     Serial.begin(921600);
 
     // Change to JPEG capture mode and initialize the OV5642 module
-    myCam.initJpeg();
-
-    myCam.OV2640_set_JPEG_size(OV2640_320x240);
+    myCam.initJpeg320x240();
 }
 
 void loop(void) 
