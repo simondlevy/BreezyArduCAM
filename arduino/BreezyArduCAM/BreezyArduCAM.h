@@ -161,15 +161,17 @@ class ArduCAM_Mini_2MP
 
         void initBmp();
 
-        void initJpeg160x120();
-        void initJpeg176x144();
-        void initJpeg320x240();
-        void initJpeg352x288();
-        void initJpeg640x480();
-        void initJpeg800x600();
-        void initJpeg1024x768();
-        void initJpeg1280x1024();
-        void initJpeg1600x1200();
+        void initJpeg160x120(void);
+        void initJpeg176x144(void);
+        void initJpeg320x240(void);
+        void initJpeg352x288(void);
+        void initJpeg640x480(void);
+        void initJpeg800x600(void);
+        void initJpeg1024x768(void);
+        void initJpeg1280x1024(void);
+        void initJpeg1600x1200(void);
+
+        void captureJpeg(void);
 
         void CS_HIGH(void);
         void CS_LOW(void);

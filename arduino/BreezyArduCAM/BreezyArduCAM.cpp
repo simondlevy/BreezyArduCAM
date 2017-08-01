@@ -489,3 +489,72 @@ byte ArduCAM_Mini_2MP::rdSensorReg16_16(uint16_t regID, uint16_t* regDat)
     delay(1);
     return (1);
 }
+
+void ArduCAM_Mini_2MP::captureJpeg(void)
+{
+    uint8_t temp = 0xff, temp_last = 0;
+    bool is_header = false;
+
+    static bool starting;
+    static bool capturing;
+
+    if (Serial.available() && Serial.read() == 1) {
+        capturing = true;
+        temp = 0xff;
+        starting = true;
+    }
+
+    if (capturing)
+    {
+        while (true) {
+
+            // Check for halt-capture command
+            if (Serial.available() && Serial.read() == 0) {
+                starting = false;
+                capturing = false;
+                break;
+            }
+
+            if (starting) {
+                flush_fifo();
+                clear_fifo_flag();
+                start_capture();
+                starting = false;
+            }
+
+            if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+                uint32_t length = 0;
+                length = read_fifo_length();
+                if ((length >= MAX_FIFO_SIZE) | (length == 0))
+                {
+                    clear_fifo_flag();
+                    starting = true;
+                    continue;
+                }
+                CS_LOW();
+                set_fifo_burst();//Set fifo burst mode
+                temp =  SPI.transfer(0x00);
+                length --;
+                while (length--) {
+                    temp_last = temp;
+                    temp =  SPI.transfer(0x00);
+                    if (is_header) {
+                        Serial.write(temp);
+                    }
+                    else if ((temp == 0xD8) & (temp_last == 0xFF)) {
+                        is_header = true;
+                        Serial.write(temp_last);
+                        Serial.write(temp);
+                    }
+                    if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
+                        break;
+                    delayMicroseconds(15);
+                }
+                CS_HIGH();
+                clear_fifo_flag();
+                starting = true;
+                is_header = false;
+            }
+        }
+    }
+}

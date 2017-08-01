@@ -109,4 +109,4 @@ if __name__ == '__main__':
     cv2.destroyAllWindows()
 
     # Send stop flag
-    sendbyte(0)
+    sendbyte(port, 0)
