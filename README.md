@@ -2,8 +2,8 @@
 
 This repository contains an Arduino library and examples for the popular ArduCAM Mini camera. 
 I've taken the code in the original ArduCAM Arduino [repository](https://github.com/ArduCAM/Arduino) 
-and simplifed the API, so you can write new appications in a minimal amount of code.  Each example
-(streaming JPEG images, BMP snapsho) has a corresponding Python script that you can run on your host 
+and simplified the API, so you can write new applications in a minimal amount of code.  Each example
+(streaming JPEG images, BMP snapshot) has a corresponding Python script that you can run on your host 
 computer.
 
 I am currently supporting only the ArduCAM Mini 2MP, but may add support for other cameras if I end
@@ -23,6 +23,9 @@ If (like me) you use an ordinary Arduino board without the ArduCAM Shield you ca
 Pay special attention to the <b>CS</b> pin, which you'll have to 
 [change](http://www.arducam.com/wp-content/uploads/2017/06/cs.jpg) in the Arduino
 sketch to match the wiring in the tutorial.
+
+As usual, you should copy the library folder (<b>arduino/BreezyArduCAM</b>) into your Arduino libraries folder.
+Then launch the Arduino IDE and go to <b>File/Examples/BreezyArduCAM</b>) to upload an example sketch.
 
 Once you've wired up the camera and loaded the sketch onto your Arduino, edit the <b>PORT</b> variable
 at the top of the Python script to reflect the serial port on which your Arduino is connected.
