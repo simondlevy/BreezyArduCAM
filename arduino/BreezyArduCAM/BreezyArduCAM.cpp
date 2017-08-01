@@ -1,43 +1,6 @@
-/*
-  ArduCAM.cpp - Arduino library support for CMOS Image Sensor
-  Copyright (C)2011-2015 ArduCAM.com. All right reserved
-
-  Basic functionality of this library are based on the demo-code provided by
-  ArduCAM.com. You can find the latest version of the library at
-  http://www.ArduCAM.com
-
-  Supported controllers:
-    - OV2640
-
-  Supported MCU platform
-    - Theoretically support all Arduino families
-      - Arduino UNO R3      (Tested)
-      - Arduino MEGA2560 R3   (Tested)
-      - Arduino Leonardo R3   (Tested)
-      - Arduino Nano      (Tested)
-      - Arduino DUE       (Tested)
-      - Arduino Yun       (Tested)
-      - Raspberry Pi      (Tested)
-      - ESP8266-12        (Tested)
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
 #include "memorysaver.h"
 #include "Arduino.h"
-#include "ArduCAM.h"
+#include "BreezyArduCAM.h"
 #include <Wire.h>
 #include <SPI.h>
 #include "HardwareSerial.h"

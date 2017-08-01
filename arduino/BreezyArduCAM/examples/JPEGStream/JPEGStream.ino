@@ -12,7 +12,7 @@
 // 3. If receive 0x20,camera will capture JPEG photo and write datas continuously.Stop when receive 0x21.
 
 #include <Wire.h>
-#include <ArduCAM.h>
+#include <BreezyArduCAM.h>
 #include <SPI.h>
 
 static const int CS = 10;
