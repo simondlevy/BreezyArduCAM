@@ -4,7 +4,11 @@
 
 This repository contains an Arduino library and examples for the popular ArduCAM Mini camera. 
 I've taken the code in the original ArduCAM Arduino [repository](https://github.com/ArduCAM/Arduino) 
-and simplified the API, so you can write new applications in a minimal amount of code.  Each example
+and simplified the API, so you can write new applications in a minimal amount of code.  
+As you can see in this 
+[example]
+(https://github.com/simondlevy/BreezyArduCAM/blob/master/arduino/BreezyArduCAM/examples/JPEGStream/JPEGStream.ino#L27-L45), you just call a constructor method, a begin method, and a capture method.
+Each example
 (streaming JPEG images, BMP snapshot) has a corresponding Python script that you can run on your host 
 computer.
 

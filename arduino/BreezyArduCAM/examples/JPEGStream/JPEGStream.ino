@@ -36,7 +36,7 @@ void setup(void)
     Serial.begin(921600);
 
     // Start the camera in JPEG mode with a specific image size
-    myCam.initJpeg320x240();
+    myCam.beginJpeg320x240();
 }
 
 void loop(void) 

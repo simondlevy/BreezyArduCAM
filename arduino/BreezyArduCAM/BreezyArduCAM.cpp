@@ -165,56 +165,56 @@ ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
     sensor_addr = 0x60;
 }
 
-void ArduCAM_Mini_2MP::initQvga(void)
+void ArduCAM_Mini_2MP::beginQvga(void)
 {
-    init();
+    begin();
 
     wrSensorRegs8_8(OV2640_QVGA);
 }
 
-void ArduCAM_Mini_2MP::initJpeg160x120(void)
+void ArduCAM_Mini_2MP::beginJpeg160x120(void)
 {
-    initJpeg(OV2640_160x120);
+    beginJpeg(OV2640_160x120);
 }
 
-void ArduCAM_Mini_2MP::initJpeg176x144(void)
+void ArduCAM_Mini_2MP::beginJpeg176x144(void)
 {
-    initJpeg(OV2640_176x144);
+    beginJpeg(OV2640_176x144);
 }
 
-void ArduCAM_Mini_2MP::initJpeg320x240(void)
+void ArduCAM_Mini_2MP::beginJpeg320x240(void)
 {
-    initJpeg(OV2640_320x240);
+    beginJpeg(OV2640_320x240);
 }
 
-void ArduCAM_Mini_2MP::initJpeg352x288(void)
+void ArduCAM_Mini_2MP::beginJpeg352x288(void)
 {
-    initJpeg(OV2640_352x288);
+    beginJpeg(OV2640_352x288);
 }
 
-void ArduCAM_Mini_2MP::initJpeg640x480(void)
+void ArduCAM_Mini_2MP::beginJpeg640x480(void)
 {
-    initJpeg(OV2640_640x480);
+    beginJpeg(OV2640_640x480);
 }
 
-void ArduCAM_Mini_2MP::initJpeg800x600(void)
+void ArduCAM_Mini_2MP::beginJpeg800x600(void)
 {
-    initJpeg(OV2640_800x600);
+    beginJpeg(OV2640_800x600);
 }
 
-void ArduCAM_Mini_2MP::initJpeg1024x768(void)
+void ArduCAM_Mini_2MP::beginJpeg1024x768(void)
 {
-    initJpeg(OV2640_1024x768);
+    beginJpeg(OV2640_1024x768);
 }
 
-void ArduCAM_Mini_2MP::initJpeg1280x1024(void)
+void ArduCAM_Mini_2MP::beginJpeg1280x1024(void)
 {
-    initJpeg(OV2640_1280x1024);
+    beginJpeg(OV2640_1280x1024);
 }
 
-void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
+void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
 {
-    initJpeg(OV2640_1600x1200);
+    beginJpeg(OV2640_1600x1200);
 }
 
 void ArduCAM_Mini_2MP::captureJpeg(void)
@@ -347,9 +347,9 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 /* Private methods                                  */
 /****************************************************/
 
-void ArduCAM_Mini_2MP::initJpeg(uint8_t size)
+void ArduCAM_Mini_2MP::beginJpeg(uint8_t size)
 {
-    init();
+    begin();
 
     wrSensorRegs8_8(OV2640_JPEG_INIT);
     wrSensorRegs8_8(OV2640_YUV422);
@@ -359,7 +359,7 @@ void ArduCAM_Mini_2MP::initJpeg(uint8_t size)
 
     OV2640_set_JPEG_size(size);
 }
-void ArduCAM_Mini_2MP::init()
+void ArduCAM_Mini_2MP::begin()
 {
     // Check if the ArduCAM SPI bus is OK
     while (true) {

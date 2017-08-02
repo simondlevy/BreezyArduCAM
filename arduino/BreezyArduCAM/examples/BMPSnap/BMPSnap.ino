@@ -37,7 +37,7 @@ void setup(void)
     Serial.begin(921600);
 
     // Change to QVGA capture mode and initialize the OV5642 module
-    myCam.initQvga();
+    myCam.beginQvga();
 }
 
 void loop(void) 

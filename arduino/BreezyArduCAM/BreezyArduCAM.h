@@ -54,17 +54,17 @@ class ArduCAM_Mini_2MP
 
         ArduCAM_Mini_2MP(int CS);
 
-        void initQvga();
+        void beginQvga();
 
-        void initJpeg160x120(void);
-        void initJpeg176x144(void);
-        void initJpeg320x240(void);
-        void initJpeg352x288(void);
-        void initJpeg640x480(void);
-        void initJpeg800x600(void);
-        void initJpeg1024x768(void);
-        void initJpeg1280x1024(void);
-        void initJpeg1600x1200(void);
+        void beginJpeg160x120(void);
+        void beginJpeg176x144(void);
+        void beginJpeg320x240(void);
+        void beginJpeg352x288(void);
+        void beginJpeg640x480(void);
+        void beginJpeg800x600(void);
+        void beginJpeg1024x768(void);
+        void beginJpeg1280x1024(void);
+        void beginJpeg1600x1200(void);
 
         void captureJpeg(void);
         void captureRaw(void);
@@ -132,9 +132,9 @@ class ArduCAM_Mini_2MP
         void transferBytes(uint8_t * out, uint8_t * in, uint32_t size);
         inline void setDataBits(uint16_t bits);
 
-        void init();
+        void begin();
 
-        void initJpeg(uint8_t size);
+        void beginJpeg(uint8_t size);
 
         regtype *P_CS;
         regsize B_CS;
