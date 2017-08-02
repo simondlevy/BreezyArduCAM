@@ -51,7 +51,7 @@ void loop(void)
                 return;
             }
 
-            myCam.captureJpeg();
+            myCam.captureJpegContinuous();
        }
     }
 }

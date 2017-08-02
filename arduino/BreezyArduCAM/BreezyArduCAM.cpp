@@ -217,7 +217,7 @@ void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
     initJpeg(OV2640_1600x1200);
 }
 
-void ArduCAM_Mini_2MP::captureJpeg(void)
+void ArduCAM_Mini_2MP::captureJpegContinuous(void)
 {
     if (starting) {
         flush_fifo();
