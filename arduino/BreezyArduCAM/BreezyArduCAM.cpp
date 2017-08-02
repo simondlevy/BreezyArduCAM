@@ -227,7 +227,6 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
         // Check for halt bit from host
         if (Serial.available() && Serial.read() == 0) {
-            starting = false;
             break;
         }
 
