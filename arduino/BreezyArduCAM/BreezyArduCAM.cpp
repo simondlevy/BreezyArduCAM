@@ -116,6 +116,11 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define GPIO_PWDN_MASK			0x02  //0 = Sensor normal operation, 	1 = Sensor standby
 #define GPIO_PWREN_MASK			0x04  //0 = Sensor LDO disable, 		1 = sensor LDO enable
 
+#define ARDUCHIP_TRIG      		0x41  //Trigger source
+#define VSYNC_MASK         		0x01
+#define SHUTTER_MASK       		0x02
+#define CAP_DONE_MASK      		0x08
+
 #define BURST_FIFO_READ			0x3C  //Burst FIFO read operation
 #define SINGLE_FIFO_READ		0x3D  //Single FIFO read operation
 
@@ -126,6 +131,9 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define FIFO_SIZE1				0x42  //Camera write FIFO size[7:0] for burst to read
 #define FIFO_SIZE2				0x43  //Camera write FIFO size[15:8]
 #define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
+
+//Define maximum frame buffer size
+#define MAX_FIFO_SIZE		    0x5FFFF			//384KByte
 
 /****************************************************/
 
