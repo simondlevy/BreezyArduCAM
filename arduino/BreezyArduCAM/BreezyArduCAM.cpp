@@ -240,6 +240,7 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
     static bool starting;
     static bool capturing;
 
+    // Wait for start bit from host
     if (Serial.available() && Serial.read() == 1) {
         capturing = true;
         temp = 0xff;
@@ -250,7 +251,7 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
     {
         while (true) {
 
-            // Check for halt-capture command
+            // Check for halt bit from host
             if (Serial.available() && Serial.read() == 0) {
                 starting = false;
                 capturing = false;
