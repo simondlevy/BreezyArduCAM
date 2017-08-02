@@ -558,3 +558,79 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
         }
     }
 }
+
+void ArduCAM_Mini_2MP::captureRaw(void)
+{
+    static bool ready;
+    static bool capturing;
+
+    if (Serial.available()) {
+
+        switch (Serial.read()) {
+            case 1:
+                ready = true;
+                capturing = true;
+                break;
+            case 0:
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (ready)
+    {
+        if (capturing)
+        {
+            //Flush the FIFO
+            flush_fifo();
+            clear_fifo_flag();
+            //Start capture
+            start_capture();
+            capturing = false;
+        }
+
+        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
+        {
+            Serial.println("ACK CMD CAM Capture Done.");
+            uint32_t length = 0;
+            length = read_fifo_length();
+            if (length >= MAX_FIFO_SIZE ) 
+            {
+                Serial.println("ACK CMD Over size.");
+                clear_fifo_flag();
+                return;
+            }
+            if (length == 0 ) //0 kb
+            {
+                Serial.println("ACK CMD Size is 0.");
+                clear_fifo_flag();
+                return;
+            }
+            CS_LOW();
+            set_fifo_burst();//Set fifo burst mode
+
+            SPI.transfer(0x00);
+            char VH, VL;
+            int i = 0, j = 0;
+            for (i = 0; i < 240; i++)
+            {
+                for (j = 0; j < 320; j++)
+                {
+                    VH = SPI.transfer(0x00);;
+                    VL = SPI.transfer(0x00);;
+                    Serial.write(VL);
+                    delayMicroseconds(12);
+                    Serial.write(VH);
+                    delayMicroseconds(12);
+                }
+            }
+            Serial.write(0xBB);
+            Serial.write(0xCC);
+            CS_HIGH();
+
+            //Clear the capture done flag
+            clear_fifo_flag();
+        }
+    }
+}
