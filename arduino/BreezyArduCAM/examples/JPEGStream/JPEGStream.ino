@@ -42,5 +42,4 @@ void setup(void)
 void loop(void) 
 {
     myCam.captureJpeg();
-
 }

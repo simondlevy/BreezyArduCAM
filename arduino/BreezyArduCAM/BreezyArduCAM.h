@@ -134,6 +134,7 @@ class ArduCAM_Mini_2MP
         regsize B_CS;
         byte sensor_addr;
         bool capturing;
+        bool starting;
 };
 
 #include "ov2640_regs.h"

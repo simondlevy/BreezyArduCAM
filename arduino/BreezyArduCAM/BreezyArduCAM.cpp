@@ -3,6 +3,8 @@ BreezyArduCAM.cpp : class implementations for BreezyArduCAM libary
 
 Copyright (C) Simon D. Levy 2017
 
+This code borrows heavily from https://github.com/ArduCAM/Arduino/tree/master/ArduCAM
+
 This file is part of BreezyArduCAM.
 
 BreezyArduCAM is free software: you can redistribute it and/or modify
@@ -83,7 +85,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_FIFO_SIZE		0x5FFFF			//384KByte
 
 /****************************************************/
-/* ArduChip registers definition 											*/
+/* ArduChip registers definition    	            */
 /****************************************************/
 #define RWBIT				    0x80  //READ AND WRITE BIT IS BIT[7]
 
@@ -116,12 +118,10 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define FIFO_RDPTR_RST_MASK     0x10
 #define FIFO_WRPTR_RST_MASK     0x20
 
-#define ARDUCHIP_GPIO			  0x06  //GPIO Write Register
-#if !(defined (ARDUCAM_SHIELD_V2) || defined (ARDUCAM_SHIELD_REVC))
-#define GPIO_RESET_MASK			0x01  //0 = Sensor reset,							1 =  Sensor normal operation
+#define ARDUCHIP_GPIO			0x06  //GPIO Write Register
+#define GPIO_RESET_MASK			0x01  //0 = Sensor reset,				1 = Sensor normal operation
 #define GPIO_PWDN_MASK			0x02  //0 = Sensor normal operation, 	1 = Sensor standby
-#define GPIO_PWREN_MASK			0x04	//0 = Sensor LDO disable, 			1 = sensor LDO enable
-#endif
+#define GPIO_PWREN_MASK			0x04  //0 = Sensor LDO disable, 		1 = sensor LDO enable
 
 #define BURST_FIFO_READ			0x3C  //Burst FIFO read operation
 #define SINGLE_FIFO_READ		0x3D  //Single FIFO read operation
@@ -139,9 +139,9 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define FIFO_SIZE2				0x43  //Camera write FIFO size[15:8]
 #define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
 
-
 /****************************************************/
 
+// Image sizes
 enum {
 
     OV2640_160x120, 		
@@ -154,6 +154,10 @@ enum {
     OV2640_1280x1024,
     OV2640_1600x1200
 };
+
+/****************************************************/
+/* Public methods                                   */
+/****************************************************/
 
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
 {
@@ -222,11 +226,8 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
     uint8_t temp = 0xff, temp_last = 0;
     bool is_header = false;
 
-    static bool starting;
-
     // Wait for start bit from host
     if (Serial.available() && Serial.read() == 1) {
-        temp = 0xff;
         capturing = true;
         starting = true;
     }
@@ -355,7 +356,9 @@ void ArduCAM_Mini_2MP::captureRaw(void)
     }
 }
 
-// private methods -------------------------------------------------------------
+/****************************************************/
+/* Private methods                                  */
+/****************************************************/
 
 void ArduCAM_Mini_2MP::initJpeg(uint8_t size)
 {
@@ -388,6 +391,7 @@ void ArduCAM_Mini_2MP::init()
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x12, 0x80);
     capturing = false;
+    starting = false;
     delay(100);
 }
 
@@ -726,4 +730,3 @@ byte ArduCAM_Mini_2MP::rdSensorReg16_16(uint16_t regID, uint16_t* regDat)
     delay(1);
     return (1);
 }
-
