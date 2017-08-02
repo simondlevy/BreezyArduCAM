@@ -228,8 +228,8 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
         starting = true;
     }
 
-    if (capturing)
-    {
+    if (capturing) {
+
         while (true) {
 
             // Check for halt bit from host
@@ -289,8 +289,8 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         capturing = true;
     }
 
-    if (capturing)
-    {
+    if (capturing) {
+
         //Flush the FIFO
         flush_fifo();
         clear_fifo_flag();
@@ -300,33 +300,32 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         capturing = false;
     }
 
-    if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
-    {
+    if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+
         Serial.println("ACK CMD CAM Capture Done.");
         uint32_t length = 0;
         length = read_fifo_length();
-        if (length >= MAX_FIFO_SIZE ) 
-        {
+
+        if (length >= MAX_FIFO_SIZE) {
             Serial.println("ACK CMD Over size.");
             clear_fifo_flag();
             return;
         }
-        if (length == 0 ) //0 kb
-        {
+
+        if (length == 0 ) {
             Serial.println("ACK CMD Size is 0.");
             clear_fifo_flag();
             return;
         }
+
         csLow();
-        set_fifo_burst();//Set fifo burst mode
+        set_fifo_burst();
 
         SPI.transfer(0x00);
         char VH, VL;
         int i = 0, j = 0;
-        for (i = 0; i < 240; i++)
-        {
-            for (j = 0; j < 320; j++)
-            {
+        for (i = 0; i < 240; i++) {
+            for (j = 0; j < 320; j++) {
                 VH = SPI.transfer(0x00);;
                 VL = SPI.transfer(0x00);;
                 sendByte(VL);
@@ -531,8 +530,7 @@ int ArduCAM_Mini_2MP::wrSensorRegs8_8(const struct sensor_reg reglist[])
     uint16_t reg_addr = 0;
     uint16_t reg_val = 0;
     const struct sensor_reg *next = reglist;
-    while ((reg_addr != 0xff) | (reg_val != 0xff))
-    {
+    while ((reg_addr != 0xff) | (reg_val != 0xff)) {
         reg_addr = pgm_read_word(&next->reg);
         reg_val = pgm_read_word(&next->val);
         /*err =*/ wrSensorReg8_8(reg_addr, reg_val);
@@ -548,8 +546,7 @@ int ArduCAM_Mini_2MP::wrSensorRegs8_16(const struct sensor_reg reglist[])
     unsigned int reg_addr=0, reg_val=0;
     const struct sensor_reg *next = reglist;
 
-    while ((reg_addr != 0xff) | (reg_val != 0xffff))
-    {
+    while ((reg_addr != 0xff) | (reg_val != 0xffff)) {
         reg_addr = pgm_read_word(&next->reg);
         reg_val = pgm_read_word(&next->val);
         /*err =*/ wrSensorReg8_16(reg_addr, reg_val);
@@ -567,9 +564,7 @@ int ArduCAM_Mini_2MP::wrSensorRegs16_8(const struct sensor_reg reglist[])
     unsigned char reg_val=0;
     const struct sensor_reg *next = reglist;
 
-    while ((reg_addr != 0xffff) | (reg_val != 0xff))
-    {
-
+    while ((reg_addr != 0xffff) | (reg_val != 0xff)) {
         reg_addr = pgm_read_word(&next->reg);
         reg_val = pgm_read_word(&next->val);
         wrSensorReg16_8(reg_addr, reg_val);
@@ -585,8 +580,7 @@ int ArduCAM_Mini_2MP::wrSensorRegs16_16(const struct sensor_reg reglist[])
     const struct sensor_reg *next = reglist;
     reg_addr = pgm_read_word(&next->reg);
     reg_val = pgm_read_word(&next->val);
-    while ((reg_addr != 0xffff) | (reg_val != 0xffff))
-    {
+    while ((reg_addr != 0xffff) | (reg_val != 0xffff)) {
         next++;
         reg_addr = pgm_read_word(&next->reg);
         reg_val = pgm_read_word(&next->val);
@@ -602,8 +596,7 @@ byte ArduCAM_Mini_2MP::wrSensorReg8_8(int regID, int regDat)
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID & 0x00FF);
     Wire.write(regDat & 0x00FF);
-    if (Wire.endTransmission())
-    {
+    if (Wire.endTransmission()) {
         return 0;
     }
     delay(1);
@@ -631,8 +624,7 @@ byte ArduCAM_Mini_2MP::wrSensorReg8_16(int regID, int regDat)
 
     Wire.write(regDat >> 8);            // sends data byte, MSB first
     Wire.write(regDat & 0x00FF);
-    if (Wire.endTransmission())
-    {
+    if (Wire.endTransmission()) {
         return 0;
     }	
     delay(1);
@@ -646,8 +638,7 @@ byte ArduCAM_Mini_2MP::rdSensorReg8_16(uint8_t regID, uint16_t* regDat)
     Wire.endTransmission();
 
     Wire.requestFrom((sensor_addr >> 1), 2);
-    if (Wire.available())
-    {
+    if (Wire.available()) {
         temp = Wire.read();
         *regDat = (temp << 8) | Wire.read();
     }
@@ -662,8 +653,7 @@ byte ArduCAM_Mini_2MP::wrSensorReg16_8(int regID, int regDat)
     Wire.write(regID >> 8);            // sends instruction byte, MSB first
     Wire.write(regID & 0x00FF);
     Wire.write(regDat & 0x00FF);
-    if (Wire.endTransmission())
-    {
+    if (Wire.endTransmission()) {
         return 0;
     }
     delay(1);
@@ -676,8 +666,7 @@ byte ArduCAM_Mini_2MP::rdSensorReg16_8(uint16_t regID, uint8_t* regDat)
     Wire.write(regID & 0x00FF);
     Wire.endTransmission();
     Wire.requestFrom((sensor_addr >> 1), 1);
-    if (Wire.available())
-    {
+    if (Wire.available()) {
         *regDat = Wire.read();
     }
     delay(1);
@@ -692,8 +681,7 @@ byte ArduCAM_Mini_2MP::wrSensorReg16_16(int regID, int regDat)
     Wire.write(regID & 0x00FF);
     Wire.write(regDat >> 8);            // sends data byte, MSB first
     Wire.write(regDat & 0x00FF);
-    if (Wire.endTransmission())
-    {
+    if (Wire.endTransmission()) {
         return 0;
     }
     delay(1);
@@ -709,8 +697,7 @@ byte ArduCAM_Mini_2MP::rdSensorReg16_16(uint16_t regID, uint16_t* regDat)
     Wire.write(regID & 0x00FF);
     Wire.endTransmission();
     Wire.requestFrom((sensor_addr >> 1), 2);
-    if (Wire.available())
-    {
+    if (Wire.available()) {
         temp = Wire.read();
         *regDat = (temp << 8) | Wire.read();
     }
