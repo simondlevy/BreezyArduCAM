@@ -24,7 +24,14 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 static const int CS = 10;
 
-ArduCAM_Mini_2MP myCam(CS);
+class SerialCam : public ArduCAM_Mini_2MP {
+
+    public:
+
+        SerialCam(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
+};
+
+SerialCam myCam(CS);
 
 void setup(void) 
 {

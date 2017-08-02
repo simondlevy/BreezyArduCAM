@@ -251,6 +251,8 @@ void ArduCAM_Mini_2MP::captureJpegContinuous(void)
                     Serial.write(tmp);
                 }
 
+                // sentinel checks: see http://vip.sugovica.hu/Sardi/kepnezo/JPEG%20File%20Layout%20and%20Format.htm
+
                 // start-of-image sentinels
                 else if ((tmp == 0xD8) & (tmp_last == 0xFF)) {
                     got_header = true;
