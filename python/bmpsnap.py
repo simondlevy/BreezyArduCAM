@@ -60,6 +60,9 @@ if __name__ == '__main__':
             break
         outfile.write(c)
 
+    # Send "stop" message
+    sendbyte(port, 0x31)
+
     # Close output file
     outfile.close()
 
