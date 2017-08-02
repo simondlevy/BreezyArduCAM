@@ -174,6 +174,8 @@ class ArduCAM_Mini_2MP
         void captureJpeg(void);
         void captureRaw(void);
 
+    private:
+
         void CS_HIGH(void);
         void CS_LOW(void);
 
@@ -228,8 +230,6 @@ class ArduCAM_Mini_2MP
         void transferBytes_(uint8_t * out, uint8_t * in, uint8_t size);
         void transferBytes(uint8_t * out, uint8_t * in, uint32_t size);
         inline void setDataBits(uint16_t bits);
-
-    private:
 
         void init();
 
