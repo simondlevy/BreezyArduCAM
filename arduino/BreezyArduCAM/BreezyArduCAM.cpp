@@ -226,9 +226,6 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
     // Wait for start bit from host
     if (Serial.available() && Serial.read() == 1) {
         capturing = true;
-        starting = true;
-        tmp = 0xff, tmp_last = 0;
-        is_header = false;
     }
 
     if (capturing)
@@ -390,7 +387,9 @@ void ArduCAM_Mini_2MP::init()
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x12, 0x80);
     capturing = false;
-    starting = false;
+    starting = true;
+    tmp = 0xff, tmp_last = 0;
+    is_header = false;
     delay(100);
 }
 
