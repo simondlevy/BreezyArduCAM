@@ -322,20 +322,21 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         set_fifo_burst();
 
         SPI.transfer(0x00);
-        char VH, VL;
-        int i = 0, j = 0;
-        for (i = 0; i < 240; i++) {
-            for (j = 0; j < 320; j++) {
-                VH = SPI.transfer(0x00);;
-                VL = SPI.transfer(0x00);;
+
+        for (int i = 0; i < 240; i++) {
+            for (int j = 0; j < 320; j++) {
+                char VH = SPI.transfer(0x00);;
+                char VL = SPI.transfer(0x00);;
                 sendByte(VL);
                 delayMicroseconds(12);
                 sendByte(VH);
                 delayMicroseconds(12);
             }
         }
+
         sendByte(0xBB);
         sendByte(0xCC);
+
         csHigh();
 
         //Clear the capture done flag
