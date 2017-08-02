@@ -78,13 +78,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /****************************************************/
-/* I2C Control Definition 						    */
-/****************************************************/
-
-//Define maximum frame buffer size
-#define MAX_FIFO_SIZE		0x5FFFF			//384KByte
-
-/****************************************************/
 /* ArduChip registers definition    	            */
 /****************************************************/
 #define RWBIT				    0x80  //READ AND WRITE BIT IS BIT[7]
@@ -129,11 +122,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define ARDUCHIP_REV       		0x40  //ArduCHIP revision
 #define VER_LOW_MASK       		0x3F
 #define VER_HIGH_MASK      		0xC0
-
-#define ARDUCHIP_TRIG      		0x41  //Trigger source
-#define VSYNC_MASK         		0x01
-#define SHUTTER_MASK       		0x02
-#define CAP_DONE_MASK      		0x08
 
 #define FIFO_SIZE1				0x42  //Camera write FIFO size[7:0] for burst to read
 #define FIFO_SIZE2				0x43  //Camera write FIFO size[15:8]
@@ -223,54 +211,6 @@ void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
 
 void ArduCAM_Mini_2MP::captureJpeg(void)
 {
-    while (true) {
-
-        // Check for halt bit from host
-        if (Serial.available() && Serial.read() == 0) {
-            return;
-        }
-
-        if (starting) {
-            flush_fifo();
-            clear_fifo_flag();
-            start_capture();
-            starting = false;
-        }
-
-        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
-            uint32_t length = 0;
-            length = read_fifo_length();
-            if ((length >= MAX_FIFO_SIZE) | (length == 0)) {
-                clear_fifo_flag();
-                starting = true;
-            }
-            else {
-                csLow();
-                set_fifo_burst();
-                tmp =  SPI.transfer(0x00);
-                length --;
-                while (length--) {
-                    tmp_last = tmp;
-                    tmp =  SPI.transfer(0x00);
-                    if (is_header) {
-                        Serial.write(tmp);
-                    }
-                    else if ((tmp == 0xD8) & (tmp_last == 0xFF)) {
-                        is_header = true;
-                        Serial.write(tmp_last);
-                        Serial.write(tmp);
-                    }
-                    if ((tmp == 0xD9) && (tmp_last == 0xFF)) 
-                        break;
-                    delayMicroseconds(15);
-                }
-                csHigh();
-                clear_fifo_flag();
-                starting = true;
-                is_header = false;
-            }
-        }
-    }
 }
 
 void ArduCAM_Mini_2MP::captureRaw(void)

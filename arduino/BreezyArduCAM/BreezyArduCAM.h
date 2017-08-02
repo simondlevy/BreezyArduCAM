@@ -69,7 +69,7 @@ class ArduCAM_Mini_2MP
         void captureJpeg(void);
         void captureRaw(void);
 
-    private:
+    //private:
 
         void csHigh(void);
         void csLow(void);
@@ -142,5 +142,15 @@ class ArduCAM_Mini_2MP
 };
 
 #include "ov2640_regs.h"
+
+//Define maximum frame buffer size
+#define MAX_FIFO_SIZE		0x5FFFF			//384KByte
+
+
+#define ARDUCHIP_TRIG      		0x41  //Trigger source
+#define VSYNC_MASK         		0x01
+#define SHUTTER_MASK       		0x02
+#define CAP_DONE_MASK      		0x08
+
 
 #endif
