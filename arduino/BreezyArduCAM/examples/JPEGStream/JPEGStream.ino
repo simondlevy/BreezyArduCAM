@@ -24,33 +24,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 static const int CS = 10;
 
-class SerialCam : public ArduCAM_Mini_2MP {
-
-    public:
-
-        SerialCam(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
-
-    protected:
-
-        virtual bool gotStartRequest(void) override 
-        {
-            return (Serial.available() && Serial.read());
-        }
-
-        virtual bool gotStopRequest(void) override 
-        {
-            return (Serial.available() && !Serial.read());
-        }
-
-        virtual void sendByte(uint8_t b) override 
-        {
-            Serial.write(b);
-        }
-
-
-};
-
-SerialCam myCam(CS);
+Serial_ArduCAM_Mini_2MP myCam(CS);
 
 void setup(void) 
 {

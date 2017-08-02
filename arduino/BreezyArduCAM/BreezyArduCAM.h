@@ -147,6 +147,33 @@ class ArduCAM_Mini_2MP
         uint8_t tmp_last;
 };
 
+class Serial_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
+
+    public:
+
+        Serial_ArduCAM_Mini_2MP(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
+
+    protected:
+
+        virtual bool gotStartRequest(void) override 
+        {
+            return (Serial.available() && Serial.read());
+        }
+
+        virtual bool gotStopRequest(void) override 
+        {
+            return (Serial.available() && !Serial.read());
+        }
+
+        virtual void sendByte(uint8_t b) override 
+        {
+            Serial.write(b);
+        }
+
+
+};
+
+
 #include "ov2640_regs.h"
 
 #endif
