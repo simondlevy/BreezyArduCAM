@@ -211,6 +211,46 @@ void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
 
 void ArduCAM_Mini_2MP::captureJpeg(void)
 {
+    if (starting) {
+        flush_fifo();
+        clear_fifo_flag();
+        start_capture();
+        starting = false;
+    }
+
+    if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+        uint32_t length = 0;
+        length = read_fifo_length();
+        if ((length >= MAX_FIFO_SIZE) | (length == 0)) {
+            clear_fifo_flag();
+            starting = true;
+        }
+        else {
+            csLow();
+            set_fifo_burst();
+            tmp =  SPI.transfer(0x00);
+            length --;
+            while (length--) {
+                tmp_last = tmp;
+                tmp =  SPI.transfer(0x00);
+                if (is_header) {
+                    Serial.write(tmp);
+                }
+                else if ((tmp == 0xD8) & (tmp_last == 0xFF)) {
+                    is_header = true;
+                    Serial.write(tmp_last);
+                    Serial.write(tmp);
+                }
+                if ((tmp == 0xD9) && (tmp_last == 0xFF)) 
+                    break;
+                delayMicroseconds(15);
+            }
+            csHigh();
+            clear_fifo_flag();
+            starting = true;
+            is_header = false;
+        }
+    }
 }
 
 void ArduCAM_Mini_2MP::captureRaw(void)
