@@ -136,7 +136,7 @@ class ArduCAM_Mini_2MP
 
         bool capturing;
         bool starting;
-        bool is_header;
+        bool got_header;
         uint8_t tmp;
         uint8_t tmp_last;
 };

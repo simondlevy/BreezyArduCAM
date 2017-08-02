@@ -227,36 +227,48 @@ void ArduCAM_Mini_2MP::captureJpegContinuous(void)
     }
 
     if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+
         uint32_t length = 0;
         length = read_fifo_length();
+
         if ((length >= MAX_FIFO_SIZE) | (length == 0)) {
             clear_fifo_flag();
             starting = true;
         }
+
         else {
+
             csLow();
             set_fifo_burst();
             tmp =  SPI.transfer(0x00);
             length --;
             while (length--) {
+
                 tmp_last = tmp;
                 tmp =  SPI.transfer(0x00);
-                if (is_header) {
+
+                if (got_header) {
                     Serial.write(tmp);
                 }
+
+                // start-of-image sentinels
                 else if ((tmp == 0xD8) & (tmp_last == 0xFF)) {
-                    is_header = true;
+                    got_header = true;
                     Serial.write(tmp_last);
                     Serial.write(tmp);
                 }
+
+                // end-of-image sentinels
                 if ((tmp == 0xD9) && (tmp_last == 0xFF)) 
                     break;
+
                 delayMicroseconds(15);
             }
+
             csHigh();
             clear_fifo_flag();
             starting = true;
-            is_header = false;
+            got_header = false;
         }
     }
 }
@@ -367,7 +379,7 @@ void ArduCAM_Mini_2MP::init()
     capturing = false;
     starting = true;
     tmp = 0xff, tmp_last = 0;
-    is_header = false;
+    got_header = false;
     delay(100);
 }
 
