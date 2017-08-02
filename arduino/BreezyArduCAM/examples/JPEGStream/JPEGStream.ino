@@ -41,5 +41,8 @@ void setup(void)
 
 void loop(void) 
 {
-    myCam.captureJpeg();
+    // Wait for start bit from host
+    if (Serial.available() && Serial.read() == 1) {
+        myCam.captureJpeg();
+    }
 }
