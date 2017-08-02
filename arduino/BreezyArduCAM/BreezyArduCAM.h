@@ -71,8 +71,8 @@ class ArduCAM_Mini_2MP
 
     private:
 
-        void CS_HIGH(void);
-        void CS_LOW(void);
+        void csHigh(void);
+        void csLow(void);
 
         void flush_fifo(void);
         void start_capture(void);
@@ -132,8 +132,8 @@ class ArduCAM_Mini_2MP
 
         regtype *P_CS;
         regsize B_CS;
-        byte m_fmt;
         byte sensor_addr;
+        bool capturing;
 };
 
 #include "ov2640_regs.h"

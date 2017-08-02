@@ -142,8 +142,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 /****************************************************/
 
-
-
 enum {
 
     OV2640_160x120, 		
@@ -172,19 +170,6 @@ void ArduCAM_Mini_2MP::initQvga(void)
     init();
 
     wrSensorRegs8_8(OV2640_QVGA);
-}
-
-void ArduCAM_Mini_2MP::initJpeg(uint8_t size)
-{
-    init();
-
-    wrSensorRegs8_8(OV2640_JPEG_INIT);
-    wrSensorRegs8_8(OV2640_YUV422);
-    wrSensorRegs8_8(OV2640_JPEG);
-    wrSensorReg8_8(0xff, 0x01);
-    wrSensorReg8_8(0x15, 0x00);
-
-    OV2640_set_JPEG_size(size);
 }
 
 void ArduCAM_Mini_2MP::initJpeg160x120(void)
@@ -238,12 +223,11 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
     bool is_header = false;
 
     static bool starting;
-    static bool capturing;
 
     // Wait for start bit from host
     if (Serial.available() && Serial.read() == 1) {
-        capturing = true;
         temp = 0xff;
+        capturing = true;
         starting = true;
     }
 
@@ -274,8 +258,8 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                     starting = true;
                     continue;
                 }
-                CS_LOW();
-                set_fifo_burst();//Set fifo burst mode
+                csLow();
+                set_fifo_burst();
                 temp =  SPI.transfer(0x00);
                 length --;
                 while (length--) {
@@ -289,11 +273,11 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                         Serial.write(temp_last);
                         Serial.write(temp);
                     }
-                    if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
+                    if ((temp == 0xD9) && (temp_last == 0xFF)) 
                         break;
                     delayMicroseconds(15);
                 }
-                CS_HIGH();
+                csHigh();
                 clear_fifo_flag();
                 starting = true;
                 is_header = false;
@@ -304,14 +288,10 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
 void ArduCAM_Mini_2MP::captureRaw(void)
 {
-    static bool ready;
-    static bool capturing;
-
     if (Serial.available()) {
 
         switch (Serial.read()) {
             case 1:
-                ready = true;
                 capturing = true;
                 break;
             case 0:
@@ -321,63 +301,74 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         }
     }
 
-    if (ready)
+    if (capturing)
     {
-        if (capturing)
+        //Flush the FIFO
+        flush_fifo();
+        clear_fifo_flag();
+        //Start capture
+        start_capture();
+        capturing = false;
+    }
+
+    if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
+    {
+        Serial.println("ACK CMD CAM Capture Done.");
+        uint32_t length = 0;
+        length = read_fifo_length();
+        if (length >= MAX_FIFO_SIZE ) 
         {
-            //Flush the FIFO
-            flush_fifo();
+            Serial.println("ACK CMD Over size.");
             clear_fifo_flag();
-            //Start capture
-            start_capture();
-            capturing = false;
+            return;
         }
-
-        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
+        if (length == 0 ) //0 kb
         {
-            Serial.println("ACK CMD CAM Capture Done.");
-            uint32_t length = 0;
-            length = read_fifo_length();
-            if (length >= MAX_FIFO_SIZE ) 
-            {
-                Serial.println("ACK CMD Over size.");
-                clear_fifo_flag();
-                return;
-            }
-            if (length == 0 ) //0 kb
-            {
-                Serial.println("ACK CMD Size is 0.");
-                clear_fifo_flag();
-                return;
-            }
-            CS_LOW();
-            set_fifo_burst();//Set fifo burst mode
-
-            SPI.transfer(0x00);
-            char VH, VL;
-            int i = 0, j = 0;
-            for (i = 0; i < 240; i++)
-            {
-                for (j = 0; j < 320; j++)
-                {
-                    VH = SPI.transfer(0x00);;
-                    VL = SPI.transfer(0x00);;
-                    Serial.write(VL);
-                    delayMicroseconds(12);
-                    Serial.write(VH);
-                    delayMicroseconds(12);
-                }
-            }
-            Serial.write(0xBB);
-            Serial.write(0xCC);
-            CS_HIGH();
-
-            //Clear the capture done flag
+            Serial.println("ACK CMD Size is 0.");
             clear_fifo_flag();
+            return;
         }
+        csLow();
+        set_fifo_burst();//Set fifo burst mode
+
+        SPI.transfer(0x00);
+        char VH, VL;
+        int i = 0, j = 0;
+        for (i = 0; i < 240; i++)
+        {
+            for (j = 0; j < 320; j++)
+            {
+                VH = SPI.transfer(0x00);;
+                VL = SPI.transfer(0x00);;
+                Serial.write(VL);
+                delayMicroseconds(12);
+                Serial.write(VH);
+                delayMicroseconds(12);
+            }
+        }
+        Serial.write(0xBB);
+        Serial.write(0xCC);
+        csHigh();
+
+        //Clear the capture done flag
+        clear_fifo_flag();
     }
 }
 
+// private methods -------------------------------------------------------------
+
+void ArduCAM_Mini_2MP::initJpeg(uint8_t size)
+{
+    init();
+
+    wrSensorRegs8_8(OV2640_JPEG_INIT);
+    wrSensorRegs8_8(OV2640_YUV422);
+    wrSensorRegs8_8(OV2640_JPEG);
+    wrSensorReg8_8(0xff, 0x01);
+    wrSensorReg8_8(0x15, 0x00);
+
+    OV2640_set_JPEG_size(size);
+}
 void ArduCAM_Mini_2MP::init()
 {
     // Check if the ArduCAM SPI bus is OK
@@ -396,6 +387,7 @@ void ArduCAM_Mini_2MP::init()
 
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x12, 0x80);
+    capturing = false;
     delay(100);
 }
 
@@ -430,11 +422,11 @@ void ArduCAM_Mini_2MP::set_fifo_burst()
     SPI.transfer(BURST_FIFO_READ);
 }
 
-void ArduCAM_Mini_2MP::CS_HIGH(void)
+void ArduCAM_Mini_2MP::csHigh(void)
 {
     sbi(P_CS, B_CS);	
 }
-void ArduCAM_Mini_2MP::CS_LOW(void)
+void ArduCAM_Mini_2MP::csLow(void)
 {
     cbi(P_CS, B_CS);	
 }
