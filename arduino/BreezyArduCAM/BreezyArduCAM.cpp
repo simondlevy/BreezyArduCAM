@@ -263,12 +263,12 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                     temp_last = temp;
                     temp =  SPI.transfer(0x00);
                     if (is_header) {
-                        Serial.write(temp);
+                        sendByte(temp);
                     }
                     else if ((temp == 0xD8) & (temp_last == 0xFF)) {
                         is_header = true;
-                        Serial.write(temp_last);
-                        Serial.write(temp);
+                        sendByte(temp_last);
+                        sendByte(temp);
                     }
                     if ((temp == 0xD9) && (temp_last == 0xFF)) 
                         break;

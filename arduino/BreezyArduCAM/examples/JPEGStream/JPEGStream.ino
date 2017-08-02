@@ -42,6 +42,11 @@ class SerialCam : public ArduCAM_Mini_2MP {
             return (Serial.available() && !Serial.read());
         }
 
+        virtual void sendByte(uint8_t b) override 
+        {
+            Serial.write(b);
+        }
+
 
 };
 

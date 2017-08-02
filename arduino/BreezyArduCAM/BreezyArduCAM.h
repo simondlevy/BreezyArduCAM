@@ -73,6 +73,7 @@ class ArduCAM_Mini_2MP
 
         virtual bool gotStartRequest(void) = 0;
         virtual bool gotStopRequest(void) = 0;
+        virtual void sendByte(uint8_t b) = 0;
 
     private:
 
