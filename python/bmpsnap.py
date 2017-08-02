@@ -44,8 +44,8 @@ if __name__ == '__main__':
     # Wait a spell
     time.sleep(0.2)
 
-    # Request single-frame capture
-    sendwithack(port, 0x30)
+    # Send "start capture" message
+    sendwithack(port, 1)
 
     stdout.write('Writing file ...')
     stdout.flush()
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         outfile.write(c)
 
     # Send "stop" message
-    sendbyte(port, 0x31)
+    sendbyte(port, 0)
 
     # Close output file
     outfile.close()

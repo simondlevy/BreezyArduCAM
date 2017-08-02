@@ -58,11 +58,11 @@ void loop(void)
     if (Serial.available()) {
 
         switch (Serial.read()) {
-            case 0x30:
+            case 1:
                 ready = true;
                 capturing = true;
                 break;
-            case 0x31:
+            case 0:
                 break;
             default:
                 break;
