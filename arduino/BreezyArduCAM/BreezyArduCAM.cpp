@@ -167,27 +167,6 @@ ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
     sensor_addr = 0x60;
 }
 
-void ArduCAM_Mini_2MP::init()
-{
-    // Check if the ArduCAM SPI bus is OK
-    while (true) {
-        write_reg(ARDUCHIP_TEST1, 0x55);
-        uint8_t temp = read_reg(ARDUCHIP_TEST1);
-        if (temp != 0x55) {
-            Serial.println("ACK CMD SPI interface Error!");
-            delay(1000);
-            continue;
-        } else{
-            Serial.println("ACK CMD SPI interface OK.");
-            break;
-        }
-    }
-
-    wrSensorReg8_8(0xff, 0x01);
-    wrSensorReg8_8(0x12, 0x80);
-    delay(100);
-}
-
 void ArduCAM_Mini_2MP::initQvga(void)
 {
     init();
@@ -252,6 +231,173 @@ void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
 {
     initJpeg(OV2640_1600x1200);
 }
+
+void ArduCAM_Mini_2MP::captureJpeg(void)
+{
+    uint8_t temp = 0xff, temp_last = 0;
+    bool is_header = false;
+
+    static bool starting;
+    static bool capturing;
+
+    if (Serial.available() && Serial.read() == 1) {
+        capturing = true;
+        temp = 0xff;
+        starting = true;
+    }
+
+    if (capturing)
+    {
+        while (true) {
+
+            // Check for halt-capture command
+            if (Serial.available() && Serial.read() == 0) {
+                starting = false;
+                capturing = false;
+                break;
+            }
+
+            if (starting) {
+                flush_fifo();
+                clear_fifo_flag();
+                start_capture();
+                starting = false;
+            }
+
+            if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+                uint32_t length = 0;
+                length = read_fifo_length();
+                if ((length >= MAX_FIFO_SIZE) | (length == 0))
+                {
+                    clear_fifo_flag();
+                    starting = true;
+                    continue;
+                }
+                CS_LOW();
+                set_fifo_burst();//Set fifo burst mode
+                temp =  SPI.transfer(0x00);
+                length --;
+                while (length--) {
+                    temp_last = temp;
+                    temp =  SPI.transfer(0x00);
+                    if (is_header) {
+                        Serial.write(temp);
+                    }
+                    else if ((temp == 0xD8) & (temp_last == 0xFF)) {
+                        is_header = true;
+                        Serial.write(temp_last);
+                        Serial.write(temp);
+                    }
+                    if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
+                        break;
+                    delayMicroseconds(15);
+                }
+                CS_HIGH();
+                clear_fifo_flag();
+                starting = true;
+                is_header = false;
+            }
+        }
+    }
+}
+
+void ArduCAM_Mini_2MP::captureRaw(void)
+{
+    static bool ready;
+    static bool capturing;
+
+    if (Serial.available()) {
+
+        switch (Serial.read()) {
+            case 1:
+                ready = true;
+                capturing = true;
+                break;
+            case 0:
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (ready)
+    {
+        if (capturing)
+        {
+            //Flush the FIFO
+            flush_fifo();
+            clear_fifo_flag();
+            //Start capture
+            start_capture();
+            capturing = false;
+        }
+
+        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
+        {
+            Serial.println("ACK CMD CAM Capture Done.");
+            uint32_t length = 0;
+            length = read_fifo_length();
+            if (length >= MAX_FIFO_SIZE ) 
+            {
+                Serial.println("ACK CMD Over size.");
+                clear_fifo_flag();
+                return;
+            }
+            if (length == 0 ) //0 kb
+            {
+                Serial.println("ACK CMD Size is 0.");
+                clear_fifo_flag();
+                return;
+            }
+            CS_LOW();
+            set_fifo_burst();//Set fifo burst mode
+
+            SPI.transfer(0x00);
+            char VH, VL;
+            int i = 0, j = 0;
+            for (i = 0; i < 240; i++)
+            {
+                for (j = 0; j < 320; j++)
+                {
+                    VH = SPI.transfer(0x00);;
+                    VL = SPI.transfer(0x00);;
+                    Serial.write(VL);
+                    delayMicroseconds(12);
+                    Serial.write(VH);
+                    delayMicroseconds(12);
+                }
+            }
+            Serial.write(0xBB);
+            Serial.write(0xCC);
+            CS_HIGH();
+
+            //Clear the capture done flag
+            clear_fifo_flag();
+        }
+    }
+}
+
+void ArduCAM_Mini_2MP::init()
+{
+    // Check if the ArduCAM SPI bus is OK
+    while (true) {
+        write_reg(ARDUCHIP_TEST1, 0x55);
+        uint8_t temp = read_reg(ARDUCHIP_TEST1);
+        if (temp != 0x55) {
+            Serial.println("ACK CMD SPI interface Error!");
+            delay(1000);
+            continue;
+        } else{
+            Serial.println("ACK CMD SPI interface OK.");
+            break;
+        }
+    }
+
+    wrSensorReg8_8(0xff, 0x01);
+    wrSensorReg8_8(0x12, 0x80);
+    delay(100);
+}
+
 
 void ArduCAM_Mini_2MP::flush_fifo(void)
 {
@@ -348,30 +494,11 @@ uint8_t ArduCAM_Mini_2MP:: bus_read(int address)
 {
     uint8_t value;
     cbi(P_CS, B_CS);
-#if (defined(ESP8266) || defined(__arm__))
-    foo
-#if defined(OV5642_MINI_5MP)
-        SPI.transfer(address);
-    value = SPI.transfer(0x00);
-    // correction for bit rotation from readback
-    value = (byte)(value >> 1) | (value << 7);
-    // take the SS pin high to de-select the chip:
-    sbi(P_CS, B_CS);
-    return value;
-#else
     SPI.transfer(address);
     value = SPI.transfer(0x00);
     // take the SS pin high to de-select the chip:
     sbi(P_CS, B_CS);
     return value;
-#endif
-#else
-    SPI.transfer(address);
-    value = SPI.transfer(0x00);
-    // take the SS pin high to de-select the chip:
-    sbi(P_CS, B_CS);
-    return value;
-#endif
 }
 
 
@@ -607,147 +734,3 @@ byte ArduCAM_Mini_2MP::rdSensorReg16_16(uint16_t regID, uint16_t* regDat)
     return (1);
 }
 
-void ArduCAM_Mini_2MP::captureJpeg(void)
-{
-    uint8_t temp = 0xff, temp_last = 0;
-    bool is_header = false;
-
-    static bool starting;
-    static bool capturing;
-
-    if (Serial.available() && Serial.read() == 1) {
-        capturing = true;
-        temp = 0xff;
-        starting = true;
-    }
-
-    if (capturing)
-    {
-        while (true) {
-
-            // Check for halt-capture command
-            if (Serial.available() && Serial.read() == 0) {
-                starting = false;
-                capturing = false;
-                break;
-            }
-
-            if (starting) {
-                flush_fifo();
-                clear_fifo_flag();
-                start_capture();
-                starting = false;
-            }
-
-            if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
-                uint32_t length = 0;
-                length = read_fifo_length();
-                if ((length >= MAX_FIFO_SIZE) | (length == 0))
-                {
-                    clear_fifo_flag();
-                    starting = true;
-                    continue;
-                }
-                CS_LOW();
-                set_fifo_burst();//Set fifo burst mode
-                temp =  SPI.transfer(0x00);
-                length --;
-                while (length--) {
-                    temp_last = temp;
-                    temp =  SPI.transfer(0x00);
-                    if (is_header) {
-                        Serial.write(temp);
-                    }
-                    else if ((temp == 0xD8) & (temp_last == 0xFF)) {
-                        is_header = true;
-                        Serial.write(temp_last);
-                        Serial.write(temp);
-                    }
-                    if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
-                        break;
-                    delayMicroseconds(15);
-                }
-                CS_HIGH();
-                clear_fifo_flag();
-                starting = true;
-                is_header = false;
-            }
-        }
-    }
-}
-
-void ArduCAM_Mini_2MP::captureRaw(void)
-{
-    static bool ready;
-    static bool capturing;
-
-    if (Serial.available()) {
-
-        switch (Serial.read()) {
-            case 1:
-                ready = true;
-                capturing = true;
-                break;
-            case 0:
-                break;
-            default:
-                break;
-        }
-    }
-
-    if (ready)
-    {
-        if (capturing)
-        {
-            //Flush the FIFO
-            flush_fifo();
-            clear_fifo_flag();
-            //Start capture
-            start_capture();
-            capturing = false;
-        }
-
-        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
-        {
-            Serial.println("ACK CMD CAM Capture Done.");
-            uint32_t length = 0;
-            length = read_fifo_length();
-            if (length >= MAX_FIFO_SIZE ) 
-            {
-                Serial.println("ACK CMD Over size.");
-                clear_fifo_flag();
-                return;
-            }
-            if (length == 0 ) //0 kb
-            {
-                Serial.println("ACK CMD Size is 0.");
-                clear_fifo_flag();
-                return;
-            }
-            CS_LOW();
-            set_fifo_burst();//Set fifo burst mode
-
-            SPI.transfer(0x00);
-            char VH, VL;
-            int i = 0, j = 0;
-            for (i = 0; i < 240; i++)
-            {
-                for (j = 0; j < 320; j++)
-                {
-                    VH = SPI.transfer(0x00);;
-                    VL = SPI.transfer(0x00);;
-                    Serial.write(VL);
-                    delayMicroseconds(12);
-                    Serial.write(VH);
-                    delayMicroseconds(12);
-                }
-            }
-            Serial.write(0xBB);
-            Serial.write(0xCC);
-            CS_HIGH();
-
-            //Clear the capture done flag
-            clear_fifo_flag();
-        }
-    }
-}
