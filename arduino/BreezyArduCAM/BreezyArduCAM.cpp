@@ -223,13 +223,12 @@ void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
 
 void ArduCAM_Mini_2MP::captureJpeg(void)
 {
-    uint8_t temp = 0xff, temp_last = 0;
-    bool is_header = false;
-
     // Wait for start bit from host
     if (Serial.available() && Serial.read() == 1) {
         capturing = true;
         starting = true;
+        tmp = 0xff, tmp_last = 0;
+        is_header = false;
     }
 
     if (capturing)
@@ -261,20 +260,20 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                 }
                 csLow();
                 set_fifo_burst();
-                temp =  SPI.transfer(0x00);
+                tmp =  SPI.transfer(0x00);
                 length --;
                 while (length--) {
-                    temp_last = temp;
-                    temp =  SPI.transfer(0x00);
+                    tmp_last = tmp;
+                    tmp =  SPI.transfer(0x00);
                     if (is_header) {
-                        Serial.write(temp);
+                        Serial.write(tmp);
                     }
-                    else if ((temp == 0xD8) & (temp_last == 0xFF)) {
+                    else if ((tmp == 0xD8) & (tmp_last == 0xFF)) {
                         is_header = true;
-                        Serial.write(temp_last);
-                        Serial.write(temp);
+                        Serial.write(tmp_last);
+                        Serial.write(tmp);
                     }
-                    if ((temp == 0xD9) && (temp_last == 0xFF)) 
+                    if ((tmp == 0xD9) && (tmp_last == 0xFF)) 
                         break;
                     delayMicroseconds(15);
                 }
