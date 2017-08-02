@@ -285,17 +285,8 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
 void ArduCAM_Mini_2MP::captureRaw(void)
 {
-    if (Serial.available()) {
-
-        switch (Serial.read()) {
-            case 1:
-                capturing = true;
-                break;
-            case 0:
-                break;
-            default:
-                break;
-        }
+    if (gotStartRequest()) {
+        capturing = true;
     }
 
     if (capturing)
@@ -303,6 +294,7 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         //Flush the FIFO
         flush_fifo();
         clear_fifo_flag();
+
         //Start capture
         start_capture();
         capturing = false;
@@ -337,14 +329,14 @@ void ArduCAM_Mini_2MP::captureRaw(void)
             {
                 VH = SPI.transfer(0x00);;
                 VL = SPI.transfer(0x00);;
-                Serial.write(VL);
+                sendByte(VL);
                 delayMicroseconds(12);
-                Serial.write(VH);
+                sendByte(VH);
                 delayMicroseconds(12);
             }
         }
-        Serial.write(0xBB);
-        Serial.write(0xCC);
+        sendByte(0xBB);
+        sendByte(0xCC);
         csHigh();
 
         //Clear the capture done flag
