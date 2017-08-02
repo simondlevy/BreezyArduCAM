@@ -66,8 +66,13 @@ class ArduCAM_Mini_2MP
         void initJpeg1280x1024(void);
         void initJpeg1600x1200(void);
 
-        void captureJpegContinuous(void);
+        void captureJpeg(void);
         void captureRaw(void);
+
+    protected:
+
+        virtual bool gotStartRequest(void) = 0;
+        virtual bool gotStopRequest(void) = 0;
 
     private:
 

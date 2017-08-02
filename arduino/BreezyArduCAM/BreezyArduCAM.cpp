@@ -217,60 +217,68 @@ void ArduCAM_Mini_2MP::initJpeg1600x1200(void)
     initJpeg(OV2640_1600x1200);
 }
 
-void ArduCAM_Mini_2MP::captureJpegContinuous(void)
+void ArduCAM_Mini_2MP::captureJpeg(void)
 {
-    if (starting) {
-        flush_fifo();
-        clear_fifo_flag();
-        start_capture();
-        starting = false;
+    uint8_t temp = 0xff, temp_last = 0;
+    bool is_header = false;
+
+    // Wait for start bit from host
+    if (gotStartRequest()) {
+        capturing = true;
+        starting = true;
     }
 
-    if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+    if (capturing)
+    {
+        while (true) {
 
-        uint32_t length = 0;
-        length = read_fifo_length();
-
-        if ((length >= MAX_FIFO_SIZE) | (length == 0)) {
-            clear_fifo_flag();
-            starting = true;
-        }
-
-        else {
-
-            csLow();
-            set_fifo_burst();
-            tmp =  SPI.transfer(0x00);
-            length --;
-            while (length--) {
-
-                tmp_last = tmp;
-                tmp =  SPI.transfer(0x00);
-
-                if (got_header) {
-                    Serial.write(tmp);
-                }
-
-                // sentinel checks: see http://vip.sugovica.hu/Sardi/kepnezo/JPEG%20File%20Layout%20and%20Format.htm
-
-                // start-of-image sentinels
-                else if ((tmp == 0xD8) & (tmp_last == 0xFF)) {
-                    got_header = true;
-                    Serial.write(tmp_last);
-                    Serial.write(tmp);
-                }
-
-                // end-of-image sentinels
-                if ((tmp == 0xD9) && (tmp_last == 0xFF)) 
-                    break;
-
-                delayMicroseconds(15);
+            // Check for halt bit from host
+            if (gotStopRequest()) {
+                starting = false;
+                capturing = false;
+                break;
             }
 
-            csHigh();
-            clear_fifo_flag();
-            starting = true;
-            got_header = false;
+            if (starting) {
+                flush_fifo();
+                clear_fifo_flag();
+                start_capture();
+                starting = false;
+            }
+
+            if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+                uint32_t length = 0;
+                length = read_fifo_length();
+                if ((length >= MAX_FIFO_SIZE) | (length == 0))
+                {
+                    clear_fifo_flag();
+                    starting = true;
+                    continue;
+                }
+                csLow();
+                set_fifo_burst();
+                temp =  SPI.transfer(0x00);
+                length --;
+                while (length--) {
+                    temp_last = temp;
+                    temp =  SPI.transfer(0x00);
+                    if (is_header) {
+                        Serial.write(temp);
+                    }
+                    else if ((temp == 0xD8) & (temp_last == 0xFF)) {
+                        is_header = true;
+                        Serial.write(temp_last);
+                        Serial.write(temp);
+                    }
+                    if ((temp == 0xD9) && (temp_last == 0xFF)) 
+                        break;
+                    delayMicroseconds(15);
+                }
+                csHigh();
+                clear_fifo_flag();
+                starting = true;
+                is_header = false;
+            }
         }
     }
 }

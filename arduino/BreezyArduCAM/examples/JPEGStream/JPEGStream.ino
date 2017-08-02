@@ -29,6 +29,20 @@ class SerialCam : public ArduCAM_Mini_2MP {
     public:
 
         SerialCam(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
+
+    protected:
+
+        virtual bool gotStartRequest(void) override 
+        {
+            return (Serial.available() && Serial.read());
+        }
+
+        virtual bool gotStopRequest(void) override 
+        {
+            return (Serial.available() && !Serial.read());
+        }
+
+
 };
 
 SerialCam myCam(CS);
@@ -48,17 +62,5 @@ void setup(void)
 
 void loop(void) 
 {
-    // Wait for start bit from host
-    if (Serial.available() && Serial.read() == 1) {
-
-        while (true) {
-
-            // Check for halt bit from host
-            if (Serial.available() && Serial.read() == 0) {
-                return;
-            }
-
-            myCam.captureJpegContinuous();
-       }
-    }
+    myCam.captureJpeg();
 }
