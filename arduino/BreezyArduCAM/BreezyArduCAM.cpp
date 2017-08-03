@@ -182,17 +182,14 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
     if (capturing) {
 
-        while (true) {
-
-            // Check for halt bit from host
-            if (gotStopRequest()) {
-                starting = false;
-                capturing = false;
-                break;
-            }
-
-            capture(true);
+        // Check for halt bit from host
+        if (gotStopRequest()) {
+            starting = false;
+            capturing = false;
+            return;
         }
+
+        capture(true);
     }
 }
 
