@@ -280,11 +280,11 @@ void ArduCAM_Mini_2MP::captureRaw(void)
             }
         }
 
-        sendByte(0xBB);
-        sendByte(0xCC);
-
         csHigh();
         clear_fifo_flag();
+
+        sendByte(0xBB);
+        sendByte(0xCC);
     }
 }
 
