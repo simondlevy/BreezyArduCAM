@@ -207,9 +207,12 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                     starting = true;
                     continue;
                 }
+
                 csLow();
                 set_fifo_burst();
+
                 temp =  SPI.transfer(0x00);
+
                 length --;
                 while (length--) {
                     temp_last = temp;
@@ -243,12 +246,10 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 
     if (capturing) {
 
-        //Flush the FIFO
         flush_fifo();
         clear_fifo_flag();
-
-        //Start capture
         start_capture();
+
         capturing = false;
     }
 
@@ -259,13 +260,11 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         length = read_fifo_length();
 
         if (length >= MAX_FIFO_SIZE) {
-            Serial.println("ACK CMD Over size.");
             clear_fifo_flag();
             return;
         }
 
         if (length == 0 ) {
-            Serial.println("ACK CMD Size is 0.");
             clear_fifo_flag();
             return;
         }
