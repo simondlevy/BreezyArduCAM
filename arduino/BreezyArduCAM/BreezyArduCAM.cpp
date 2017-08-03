@@ -239,6 +239,7 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 
         if (length >= MAX_FIFO_SIZE || length == 0) {
             clear_fifo_flag();
+            starting = true;
             return;
         }
 
