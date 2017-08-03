@@ -199,9 +199,11 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
             }
 
             if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+
                 uint32_t length = 0;
                 length = read_fifo_length();
-                if ((length >= MAX_FIFO_SIZE) | (length == 0))
+
+                if (length >= MAX_FIFO_SIZE || length == 0)
                 {
                     clear_fifo_flag();
                     starting = true;
