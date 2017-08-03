@@ -243,16 +243,15 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 void ArduCAM_Mini_2MP::captureRaw(void)
 {
     if (gotStartRequest()) {
-        capturing = true;
+        starting = true;
     }
 
-    if (capturing) {
+    if (starting) {
 
         flush_fifo();
         clear_fifo_flag();
         start_capture();
-
-        capturing = false;
+        starting = false;
     }
 
     if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
@@ -323,7 +322,7 @@ void ArduCAM_Mini_2MP::begin()
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x12, 0x80);
     capturing = false;
-    starting = true;
+    starting = false;
     tmp = 0xff, tmp_last = 0;
     got_header = false;
     delay(100);
