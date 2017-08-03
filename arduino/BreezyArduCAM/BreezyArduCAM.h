@@ -137,6 +137,8 @@ class ArduCAM_Mini_2MP
         void csHigh(void);
         void csLow(void);
 
+        void grabRawFrame(void);
+
         void flush_fifo(void);
         void start_capture(void);
         void clear_fifo_flag(void);

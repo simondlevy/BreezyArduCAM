@@ -211,8 +211,7 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
                 csLow();
                 set_fifo_burst();
-
-                temp =  SPI.transfer(0x00);
+                SPI.transfer(0x00);
 
                 while (--length) {
                     temp_last = temp;
@@ -265,19 +264,9 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 
         csLow();
         set_fifo_burst();
-
         SPI.transfer(0x00);
 
-        for (int i = 0; i < 240; i++) {
-            for (int j = 0; j < 320; j++) {
-                char VH = SPI.transfer(0x00);;
-                char VL = SPI.transfer(0x00);;
-                sendByte(VL);
-                delayMicroseconds(12);
-                sendByte(VH);
-                delayMicroseconds(12);
-            }
-        }
+        grabRawFrame();
 
         csHigh();
         clear_fifo_flag();
@@ -290,6 +279,21 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 /****************************************************/
 /* Private methods                                  */
 /****************************************************/
+
+void ArduCAM_Mini_2MP::grabRawFrame(void)
+{
+    for (int i = 0; i < 240; i++) {
+        for (int j = 0; j < 320; j++) {
+            char VH = SPI.transfer(0x00);;
+            char VL = SPI.transfer(0x00);;
+            sendByte(VL);
+            delayMicroseconds(12);
+            sendByte(VH);
+            delayMicroseconds(12);
+        }
+    }
+
+}
 
 void ArduCAM_Mini_2MP::beginJpeg(uint8_t size)
 {
