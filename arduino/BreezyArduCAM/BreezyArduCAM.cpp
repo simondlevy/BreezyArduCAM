@@ -253,8 +253,6 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         csHigh();
         clear_fifo_flag();
 
-        sendByte(0xBB);
-        sendByte(0xCC);
     }
 }
 
@@ -297,6 +295,8 @@ void ArduCAM_Mini_2MP::grabRawFrame(void)
         }
     }
 
+    sendByte(0xBB);
+    sendByte(0xCC);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg(uint8_t size)
