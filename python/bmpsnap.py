@@ -44,12 +44,20 @@ header = [
 ]
 
 
+# helpers  --------------------------------------------------------------------------
+
+def dump(msg):
+    stdout.write(msg)
+    stdout.flush()
+
 # main ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    # Open connection to Arduino
+    # Open connection to Arduino with a timeout of two seconds
     port = serial.Serial(PORT, BAUD, timeout=2)
+
+    dump('Starting capture ...')
 
     # Validate startup message
     ackcheck(port, 'SPI interface OK.')
@@ -58,10 +66,9 @@ if __name__ == '__main__':
     time.sleep(0.2)
 
     # Send "start capture" message
-    sendwithack(port, 1)
+    sendbyte(port, 1)
 
-    stdout.write('Writing file %s (will appear upside-down) ...' % OUTFILENAME)
-    stdout.flush()
+    dump('\nWriting file %s (will appear upside-down) ...' % OUTFILENAME)
 
     # Open output file
     outfile = open(OUTFILENAME, 'wb')

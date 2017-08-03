@@ -37,8 +37,8 @@ BAUD = 921600   # Arduino Uno
 
 if __name__ == '__main__':
 
-    # Open connection to Arduino
-    port = serial.Serial(PORT, BAUD)
+    # Open connection to Arduino with a timeout of two seconds
+    port = serial.Serial(PORT, BAUD, timeout=2)
 
     # Validate startup message
     ackcheck(port, 'SPI interface OK.')
@@ -94,12 +94,13 @@ if __name__ == '__main__':
             # Track previous byte
             prevbyte = currbyte
 
+    # Send stop flag
+    sendbyte(port, 0)
+
     # Report FPS
     elapsed = time.time() - start
     print('%d frames in %2.2f seconds = %2.2f frames per second' % (count, elapsed, count/elapsed))
-
+  
     # Close the window
     cv2.destroyAllWindows()
 
-    # Send stop flag
-    sendbyte(port, 0)

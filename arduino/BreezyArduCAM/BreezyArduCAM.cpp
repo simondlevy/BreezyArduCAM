@@ -200,8 +200,7 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
             if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
 
-                uint32_t length = 0;
-                length = read_fifo_length();
+                uint32_t length = read_fifo_length();
 
                 if (length >= MAX_FIFO_SIZE || length == 0)
                 {
@@ -231,8 +230,10 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                         break;
                     delayMicroseconds(15);
                 }
+
                 csHigh();
                 clear_fifo_flag();
+
                 starting = true;
                 is_header = false;
             }
@@ -257,16 +258,9 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 
     if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
 
-        Serial.println("ACK CMD CAM Capture Done.");
-        uint32_t length = 0;
-        length = read_fifo_length();
+        uint32_t length = read_fifo_length();
 
-        if (length >= MAX_FIFO_SIZE) {
-            clear_fifo_flag();
-            return;
-        }
-
-        if (length == 0 ) {
+        if (length >= MAX_FIFO_SIZE || length == 0) {
             clear_fifo_flag();
             return;
         }
@@ -291,8 +285,6 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         sendByte(0xCC);
 
         csHigh();
-
-        //Clear the capture done flag
         clear_fifo_flag();
     }
 }

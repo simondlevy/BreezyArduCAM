@@ -25,9 +25,5 @@ def getack(port):
 def sendbyte(port, value):
     port.write(bytearray([value]))
 
-def sendwithack(port, value):
-    sendbyte(port, value)
-    getack(port)
-
 def ackcheck(port, msg):
     assert(msg in port.readline().decode())
