@@ -214,8 +214,6 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
                 csHigh();
                 clear_fifo_flag();
-
-                starting = true;
             }
         }
     }
@@ -252,7 +250,6 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 
         csHigh();
         clear_fifo_flag();
-
     }
 }
 
@@ -280,6 +277,9 @@ void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
             break;
         delayMicroseconds(15);
     }
+
+    // supports continuous capture
+    starting = true;
 }
 
 void ArduCAM_Mini_2MP::grabRawFrame(void)
