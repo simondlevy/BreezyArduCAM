@@ -34,46 +34,103 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 
-/****************************************************************/
-/* define a structure for sensor register initialization values */
-/****************************************************************/
+// a structure for sensor register initialization values
 struct sensor_reg {
     uint16_t reg;
     uint16_t val;
 };
 
-
-
-/****************************************************************/
-/* define a structure for sensor register initialization values */
-/****************************************************************/
-
+/**
+ * An abstract class for the ArduCAM Mini 2MP.  
+ */
 class ArduCAM_Mini_2MP
 {
     public:
 
-        ArduCAM_Mini_2MP(int CS);
+        /**
+         * Constructs an ArduCAM_Mini_2MP object.
+         * @param cs pin for Chip Select signal
+         */
+        ArduCAM_Mini_2MP(int cs);
 
+        /**
+         * Begins capture in QVGA (raw 320x240) mode.
+         */
         void beginQvga();
 
+        /**
+         * Begins 160x120 JPEG capture.
+         */
         void beginJpeg160x120(void);
+
+        /**
+         * Begins 176x144 JPEG capture.
+         */
         void beginJpeg176x144(void);
+        /**
+         * Begins 320x240 JPEG capture.
+         */
         void beginJpeg320x240(void);
+
+        /**
+         * Begins 352x288 JPEG capture.
+         */
         void beginJpeg352x288(void);
+
+        /**
+         * Begins 640x480 JPEG capture.
+         */
         void beginJpeg640x480(void);
+
+        /**
+         * Begins 800x600 JPEG capture.
+         */
         void beginJpeg800x600(void);
+
+        /**
+         * Begins 1024x768 JPEG capture.
+         */
         void beginJpeg1024x768(void);
+
+        /**
+         * Begins 1200x1024 JPEG capture.
+         */
         void beginJpeg1280x1024(void);
+
+        /**
+         * Begins 1600x1200 JPEG capture.
+         */
         void beginJpeg1600x1200(void);
 
+        /**
+         * Runs in Arduino loop() function to capture JPEG bytes.
+         */
         void captureJpeg(void);
+
+        /**
+          Runs in Arduino loop() function to capture raw image bytes.
+         */
         void captureRaw(void);
 
     protected:
 
+        /**
+         * Override this method in your implementing class.
+         * @return true when you're ready to begin capture, false otherwise
+         */
         virtual bool gotStartRequest(void) = 0;
+
+        /**
+         * Override this method in your implementing class.
+         * @return true when you're ready to stop capture, false otherwise
+         */
         virtual bool gotStopRequest(void) = 0;
-        virtual void sendByte(uint8_t b) = 0;
+
+        /**
+         * Override this method in your implementing class.
+         * @param b byte to send to host or other consumer
+         */
+         virtual void sendByte(uint8_t b) = 0;
 
     private:
 
