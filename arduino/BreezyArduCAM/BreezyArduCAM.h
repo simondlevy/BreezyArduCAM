@@ -45,6 +45,8 @@ struct sensor_reg {
  */
 class ArduCAM_Mini_2MP
 {
+    friend class FrameGrabber;
+
     public:
 
         /**
@@ -137,8 +139,10 @@ class ArduCAM_Mini_2MP
         void csHigh(void);
         void csLow(void);
 
+        void capture(bool useJpeg);
+
         void grabJpegFrame(uint32_t length);
-        void grabRawFrame(void);
+        void grabRawFrame(uint32_t length);
 
         void flush_fifo(void);
         void start_capture(void);
@@ -247,7 +251,6 @@ class Serial_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
             Serial.write(b);
         }
 };
-
 
 #include "ov2640_regs.h"
 

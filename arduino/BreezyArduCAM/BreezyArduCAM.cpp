@@ -87,9 +87,11 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 //Define maximum frame buffer size
 #define MAX_FIFO_SIZE		    0x5FFFF //384KByte
 
+
+/****************************************************/
+/* Image sizes                                      */
 /****************************************************/
 
-// Image sizes
 enum {
 
     OV2640_160x120, 		
@@ -102,6 +104,7 @@ enum {
     OV2640_1280x1024,
     OV2640_1600x1200
 };
+
 
 /****************************************************/
 /* Public methods                                   */
@@ -188,33 +191,7 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                 break;
             }
 
-            if (starting) {
-                flush_fifo();
-                clear_fifo_flag();
-                start_capture();
-                starting = false;
-            }
-
-            if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
-
-                uint32_t length = read_fifo_length();
-
-                if (length >= MAX_FIFO_SIZE || length == 0)
-                {
-                    clear_fifo_flag();
-                    starting = true;
-                    continue;
-                }
-
-                csLow();
-                set_fifo_burst();
-                SPI.transfer(0x00);
-
-                grabJpegFrame(length);
-
-                csHigh();
-                clear_fifo_flag();
-            }
+            capture(true);
         }
     }
 }
@@ -225,8 +202,17 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         starting = true;
     }
 
-    if (starting) {
+    capture(false);
+}
 
+/****************************************************/
+/* Private methods                                  */
+/****************************************************/
+
+void ArduCAM_Mini_2MP::capture(bool useJpeg)
+{
+
+    if (starting) {
         flush_fifo();
         clear_fifo_flag();
         start_capture();
@@ -247,16 +233,15 @@ void ArduCAM_Mini_2MP::captureRaw(void)
         set_fifo_burst();
         SPI.transfer(0x00);
 
-        grabRawFrame();
+        if (useJpeg)
+            grabJpegFrame(length);
+        else
+            grabRawFrame(length);
 
         csHigh();
         clear_fifo_flag();
     }
 }
-
-/****************************************************/
-/* Private methods                                  */
-/****************************************************/
 
 void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
 {
@@ -283,8 +268,11 @@ void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
     starting = true;
 }
 
-void ArduCAM_Mini_2MP::grabRawFrame(void)
+void ArduCAM_Mini_2MP::grabRawFrame(uint32_t length)
 {
+    // ignore length and use fixed-size frame
+    (void)length;
+
     for (int i = 0; i < 240; i++) {
         for (int j = 0; j < 320; j++) {
             char VH = SPI.transfer(0x00);;
