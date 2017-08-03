@@ -31,6 +31,8 @@ PORT = '/dev/ttyACM0' # Ubuntu
 
 BAUD = 921600   # Arduino Uno
 
+OUTFILENAME = 'test.bmp'
+
 # BMP header for 320x240 imagel ------------------------------------------------------
 
 header = [
@@ -58,11 +60,11 @@ if __name__ == '__main__':
     # Send "start capture" message
     sendwithack(port, 1)
 
-    stdout.write('Writing file (will appear upside-down) ...')
+    stdout.write('Writing file %s (will appear upside-down) ...' % OUTFILENAME)
     stdout.flush()
 
     # Open output file
-    outfile = open('test.bmp', 'wb')
+    outfile = open(OUTFILENAME, 'wb')
 
     # Write BMP header
     outfile.write(bytearray(header))
