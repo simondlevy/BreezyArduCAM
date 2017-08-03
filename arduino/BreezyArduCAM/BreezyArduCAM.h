@@ -204,30 +204,45 @@ class ArduCAM_Mini_2MP
         uint8_t tmp_last;
 };
 
+/**
+ * A class for communicating with the ArduCAM Mini 2MP over a serial connection.  
+ */
 class Serial_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
 
     public:
 
+        /**
+         * Constructs a Seiral_ArduCAM_Mini_2MP object.
+         * @param cs pin for Chip Select signal
+         */
         Serial_ArduCAM_Mini_2MP(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
 
     protected:
 
+        /**
+         * Implements the gotStartRequest() method by checking for a nonzero byte from the host computer.
+         */
         virtual bool gotStartRequest(void) override 
         {
             return (Serial.available() && Serial.read());
         }
 
+        /**
+         * Implements the gotStopRequest() method by checking for a zero byte from the host computer.
+         */
         virtual bool gotStopRequest(void) override 
         {
             return (Serial.available() && !Serial.read());
         }
 
+        /**
+         * Implements the sencByte() method by sending the byte to the host computer.
+         * @param b the byte to send
+         */
         virtual void sendByte(uint8_t b) override 
         {
             Serial.write(b);
         }
-
-
 };
 
 
