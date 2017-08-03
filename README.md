@@ -39,11 +39,21 @@ at the top of the Python script to reflect the serial port on which your Arduino
 
 <h2>Note on the streaming JPEG example</h2>
 
-This example requires you to be running OpenCV for Python on your computer.
-If you're a Python (or C++) programmer interested in computer vision, you're going to want to get familiar with
-OpenCV, and if you're a Python programmer, you're eventually going to have to switch from Python2 to Python3 if
-you haven't already.  Since I use Windows and Ubuntu, I can't help you with doing this on Mac OS X.  On
-Ubuntu 16.04 I was able to get OpenCV installed for Python3 in about ten minutes, using this
-[tutorial](http://cyaninfinite.com/tutorials/installing-opencv-in-ubuntu-for-python-3/).  On Windows 10
-I followed these [directions](https://www.solarianprogrammer.com/2016/09/17/install-opencv-3-with-python-3-on-windows/)
+This example requires you to be running OpenCV for Python on your computer.  The Python program saves the
+successive JPEG images to a single temporary file for display.  If you're a
+Python (or C++) programmer interested in computer vision, you're going to want
+to get familiar with OpenCV, and if you're a Python programmer, you're
+eventually going to have to switch from Python2 to Python3 if you haven't
+already.  Since I use Windows and Ubuntu, I can't help you with doing this on
+Mac OS X.  On Ubuntu 16.04 I was able to get OpenCV installed for Python3 in
+about ten minutes, using this
+[tutorial](http://cyaninfinite.com/tutorials/installing-opencv-in-ubuntu-for-python-3/).
+On Windows 10 I followed these
+[directions](https://www.solarianprogrammer.com/2016/09/17/install-opencv-3-with-python-3-on-windows/)
 (which may also help you if you need to install pyserial).
+
+<h2>Note on the BMP snapshot example</h2>
+
+This example saves a single 320x240 image to a file <b>test.bmp</b>.  For the reason explained 
+[here](https://stackoverflow.com/questions/8346115/why-are-bmps-stored-upside-down), 
+the BMP file will appear upside-down when displayed.
