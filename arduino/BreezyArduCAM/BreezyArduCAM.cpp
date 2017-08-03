@@ -214,8 +214,7 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
 
                 temp =  SPI.transfer(0x00);
 
-                length --;
-                while (length--) {
+                while (--length) {
                     temp_last = temp;
                     temp =  SPI.transfer(0x00);
                     if (is_header) {
