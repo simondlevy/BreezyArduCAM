@@ -57,3 +57,7 @@ On Windows 10 I followed these
 This example saves a single 320x240 image to a file <b>test.bmp</b>.  For the reason explained 
 [here](https://stackoverflow.com/questions/8346115/why-are-bmps-stored-upside-down), 
 the BMP file will appear upside-down when displayed.
+
+<h2>Known bug</h2>
+
+Sometimes the <b>bmpsnap.py</b> script will report an Unicode decoding error when you run it for the first time.
