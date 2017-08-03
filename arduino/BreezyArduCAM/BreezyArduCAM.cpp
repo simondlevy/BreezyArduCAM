@@ -171,9 +171,6 @@ void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
 
 void ArduCAM_Mini_2MP::captureJpeg(void)
 {
-    uint8_t temp = 0xff, temp_last = 0;
-    bool is_header = false;
-
     // Wait for start bit from host
     if (gotStartRequest()) {
         capturing = true;
@@ -213,27 +210,12 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
                 set_fifo_burst();
                 SPI.transfer(0x00);
 
-                while (--length) {
-                    temp_last = temp;
-                    temp =  SPI.transfer(0x00);
-                    if (is_header) {
-                        sendByte(temp);
-                    }
-                    else if ((temp == 0xD8) & (temp_last == 0xFF)) {
-                        is_header = true;
-                        sendByte(temp_last);
-                        sendByte(temp);
-                    }
-                    if ((temp == 0xD9) && (temp_last == 0xFF)) 
-                        break;
-                    delayMicroseconds(15);
-                }
+                grabJpegFrame(length);
 
                 csHigh();
                 clear_fifo_flag();
 
                 starting = true;
-                is_header = false;
             }
         }
     }
@@ -279,6 +261,28 @@ void ArduCAM_Mini_2MP::captureRaw(void)
 /****************************************************/
 /* Private methods                                  */
 /****************************************************/
+
+void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
+{
+    uint8_t temp = 0xff, temp_last = 0;
+    bool is_header = false;
+
+    while (--length) {
+        temp_last = temp;
+        temp =  SPI.transfer(0x00);
+        if (is_header) {
+            sendByte(temp);
+        }
+        else if ((temp == 0xD8) & (temp_last == 0xFF)) {
+            is_header = true;
+            sendByte(temp_last);
+            sendByte(temp);
+        }
+        if ((temp == 0xD9) && (temp_last == 0xFF)) 
+            break;
+        delayMicroseconds(15);
+    }
+}
 
 void ArduCAM_Mini_2MP::grabRawFrame(void)
 {
