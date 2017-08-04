@@ -112,7 +112,7 @@ class ArduCAM_Mini_2MP
         /**
           Runs in Arduino loop() function to capture raw image bytes.
          */
-        void captureRaw(void);
+        void captureQvga(void);
 
     protected:
 
@@ -142,7 +142,7 @@ class ArduCAM_Mini_2MP
         void capture(bool useJpeg);
 
         void grabJpegFrame(uint32_t length);
-        void grabRawFrame(uint32_t length);
+        void grabQvgaFrame(uint32_t length);
 
         void flush_fifo(void);
         void start_capture(void);

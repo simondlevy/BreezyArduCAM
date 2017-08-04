@@ -42,5 +42,5 @@ void setup(void)
 
 void loop(void) 
 {
-    myCam.captureRaw();
+    myCam.captureQvga();
 }

@@ -175,7 +175,7 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
     }
 }
 
-void ArduCAM_Mini_2MP::captureRaw(void)
+void ArduCAM_Mini_2MP::captureQvga(void)
 {
     if (gotStartRequest()) {
         starting = true;
@@ -215,7 +215,7 @@ void ArduCAM_Mini_2MP::capture(bool useJpeg)
         if (useJpeg)
             grabJpegFrame(length);
         else
-            grabRawFrame(length);
+            grabQvgaFrame(length);
 
         csHigh();
         clear_fifo_flag();
@@ -247,7 +247,7 @@ void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
     starting = true;
 }
 
-void ArduCAM_Mini_2MP::grabRawFrame(uint32_t length)
+void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
 {
     // ignore length and use fixed-size frame
     (void)length;
