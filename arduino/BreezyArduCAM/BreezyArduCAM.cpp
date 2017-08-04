@@ -89,24 +89,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /****************************************************/
-/* Image sizes                                      */
-/****************************************************/
-
-enum {
-
-    OV2640_160x120, 		
-    OV2640_176x144, 		
-    OV2640_320x240, 	
-    OV2640_352x288,	
-    OV2640_640x480,	
-    OV2640_800x600, 	
-    OV2640_1024x768,	
-    OV2640_1280x1024,
-    OV2640_1600x1200
-};
-
-
-/****************************************************/
 /* Public methods                                   */
 /****************************************************/
 
@@ -129,47 +111,47 @@ void ArduCAM_Mini_2MP::beginQvga(void)
 
 void ArduCAM_Mini_2MP::beginJpeg160x120(void)
 {
-    beginJpeg(OV2640_160x120);
+    beginJpeg(OV2640_160x120_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg176x144(void)
 {
-    beginJpeg(OV2640_176x144);
+    beginJpeg(OV2640_176x144_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg320x240(void)
 {
-    beginJpeg(OV2640_320x240);
+    beginJpeg(OV2640_320x240_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg352x288(void)
 {
-    beginJpeg(OV2640_352x288);
+    beginJpeg(OV2640_352x288_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg640x480(void)
 {
-    beginJpeg(OV2640_640x480);
+    beginJpeg(OV2640_640x480_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg800x600(void)
 {
-    beginJpeg(OV2640_800x600);
+    beginJpeg(OV2640_800x600_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg1024x768(void)
 {
-    beginJpeg(OV2640_1024x768);
+    beginJpeg(OV2640_1024x768_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg1280x1024(void)
 {
-    beginJpeg(OV2640_1280x1024);
+    beginJpeg(OV2640_1280x1024_JPEG);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
 {
-    beginJpeg(OV2640_1600x1200);
+    beginJpeg(OV2640_1600x1200_JPEG);
 }
 
 void ArduCAM_Mini_2MP::captureJpeg(void)
@@ -285,7 +267,7 @@ void ArduCAM_Mini_2MP::grabRawFrame(uint32_t length)
     sendByte(0xCC);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg(uint8_t size)
+void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
 {
     begin();
 
@@ -295,7 +277,7 @@ void ArduCAM_Mini_2MP::beginJpeg(uint8_t size)
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x15, 0x00);
 
-    OV2640_set_JPEG_size(size);
+    wrSensorRegs8_8(reglist);
 }
 void ArduCAM_Mini_2MP::begin()
 {
@@ -422,43 +404,6 @@ uint8_t ArduCAM_Mini_2MP:: bus_read(int address)
     // take the SS pin high to de-select the chip:
     sbi(P_CS, B_CS);
     return value;
-}
-
-void ArduCAM_Mini_2MP::OV2640_set_JPEG_size(uint8_t size)
-{
-    switch(size)
-    {
-        case OV2640_160x120:
-            wrSensorRegs8_8(OV2640_160x120_JPEG);
-            break;
-        case OV2640_176x144:
-            wrSensorRegs8_8(OV2640_176x144_JPEG);
-            break;
-        case OV2640_320x240:
-            wrSensorRegs8_8(OV2640_320x240_JPEG);
-            break;
-        case OV2640_352x288:
-            wrSensorRegs8_8(OV2640_352x288_JPEG);
-            break;
-        case OV2640_640x480:
-            wrSensorRegs8_8(OV2640_640x480_JPEG);
-            break;
-        case OV2640_800x600:
-            wrSensorRegs8_8(OV2640_800x600_JPEG);
-            break;
-        case OV2640_1024x768:
-            wrSensorRegs8_8(OV2640_1024x768_JPEG);
-            break;
-        case OV2640_1280x1024:
-            wrSensorRegs8_8(OV2640_1280x1024_JPEG);
-            break;
-        case OV2640_1600x1200:
-            wrSensorRegs8_8(OV2640_1600x1200_JPEG);
-            break;
-        default:
-            wrSensorRegs8_8(OV2640_320x240_JPEG);
-            break;
-    }
 }
 
 // Write 8 bit values to 8 bit register address

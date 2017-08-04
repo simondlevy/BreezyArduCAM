@@ -162,15 +162,13 @@ class ArduCAM_Mini_2MP
         uint8_t bus_write(int address, int value);
         uint8_t bus_read(int address);	
 
-        void OV2640_set_JPEG_size(uint8_t size);
-
         int wrSensorRegs8_8(const struct sensor_reg*);
         byte wrSensorReg8_8(int regID, int regDat);
         byte rdSensorReg8_8(uint8_t regID, uint8_t* regDat);
 
         void begin();
 
-        void beginJpeg(uint8_t size);
+        void beginJpeg(const struct sensor_reg reglist[]);
 
         regtype *P_CS;
         regsize B_CS;
