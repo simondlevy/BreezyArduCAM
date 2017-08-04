@@ -315,10 +315,10 @@ void ArduCAM_Mini_2MP::begin()
 
     wrSensorReg8_8(0xff, 0x01);
     wrSensorReg8_8(0x12, 0x80);
+
     capturing = false;
     starting = false;
-    tmp = 0xff, tmp_last = 0;
-    got_header = false;
+
     delay(100);
 }
 
@@ -471,63 +471,14 @@ int ArduCAM_Mini_2MP::wrSensorRegs8_8(const struct sensor_reg reglist[])
     while ((reg_addr != 0xff) | (reg_val != 0xff)) {
         reg_addr = pgm_read_word(&next->reg);
         reg_val = pgm_read_word(&next->val);
-        /*err =*/ wrSensorReg8_8(reg_addr, reg_val);
+        wrSensorReg8_8(reg_addr, reg_val);
         next++;
     }
     return 1;
 }
 
-// Write 16 bit values to 8 bit register address
-int ArduCAM_Mini_2MP::wrSensorRegs8_16(const struct sensor_reg reglist[])
-{
-    //int err = 0;
-    unsigned int reg_addr=0, reg_val=0;
-    const struct sensor_reg *next = reglist;
-
-    while ((reg_addr != 0xff) | (reg_val != 0xffff)) {
-        reg_addr = pgm_read_word(&next->reg);
-        reg_val = pgm_read_word(&next->val);
-        /*err =*/ wrSensorReg8_16(reg_addr, reg_val);
-        //  if (!err)
-        //return err;
-        next++;
-    }
-    return 1;
-}
 
 // Write 8 bit values to 16 bit register address
-int ArduCAM_Mini_2MP::wrSensorRegs16_8(const struct sensor_reg reglist[])
-{
-    unsigned int reg_addr=0;
-    unsigned char reg_val=0;
-    const struct sensor_reg *next = reglist;
-
-    while ((reg_addr != 0xffff) | (reg_val != 0xff)) {
-        reg_addr = pgm_read_word(&next->reg);
-        reg_val = pgm_read_word(&next->val);
-        wrSensorReg16_8(reg_addr, reg_val);
-        next++;
-    }
-    return 1;
-}
-
-//I2C Array Write 16bit address, 16bit data
-int ArduCAM_Mini_2MP::wrSensorRegs16_16(const struct sensor_reg reglist[])
-{
-    unsigned int reg_addr, reg_val;
-    const struct sensor_reg *next = reglist;
-    reg_addr = pgm_read_word(&next->reg);
-    reg_val = pgm_read_word(&next->val);
-    while ((reg_addr != 0xffff) | (reg_val != 0xffff)) {
-        next++;
-        reg_addr = pgm_read_word(&next->reg);
-        reg_val = pgm_read_word(&next->val);
-    }
-    return 1;
-}
-
-
-
 // Read/write 8 bit value to/from 8 bit register address	
 byte ArduCAM_Mini_2MP::wrSensorReg8_8(int regID, int regDat)
 {
@@ -553,92 +504,4 @@ byte ArduCAM_Mini_2MP::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
     delay(1);
     return 1;
 
-}
-// Read/write 16 bit value to/from 8 bit register address
-byte ArduCAM_Mini_2MP::wrSensorReg8_16(int regID, int regDat)
-{
-    Wire.beginTransmission(sensor_addr >> 1);
-    Wire.write(regID & 0x00FF);
-
-    Wire.write(regDat >> 8);            // sends data byte, MSB first
-    Wire.write(regDat & 0x00FF);
-    if (Wire.endTransmission()) {
-        return 0;
-    }	
-    delay(1);
-    return 1;
-}
-byte ArduCAM_Mini_2MP::rdSensorReg8_16(uint8_t regID, uint16_t* regDat)
-{
-    uint8_t temp;
-    Wire.beginTransmission(sensor_addr >> 1);
-    Wire.write(regID);
-    Wire.endTransmission();
-
-    Wire.requestFrom((sensor_addr >> 1), 2);
-    if (Wire.available()) {
-        temp = Wire.read();
-        *regDat = (temp << 8) | Wire.read();
-    }
-    delay(1);
-    return 1;
-}
-
-// Read/write 8 bit value to/from 16 bit register address
-byte ArduCAM_Mini_2MP::wrSensorReg16_8(int regID, int regDat)
-{
-    Wire.beginTransmission(sensor_addr >> 1);
-    Wire.write(regID >> 8);            // sends instruction byte, MSB first
-    Wire.write(regID & 0x00FF);
-    Wire.write(regDat & 0x00FF);
-    if (Wire.endTransmission()) {
-        return 0;
-    }
-    delay(1);
-    return 1;
-}
-byte ArduCAM_Mini_2MP::rdSensorReg16_8(uint16_t regID, uint8_t* regDat)
-{
-    Wire.beginTransmission(sensor_addr >> 1);
-    Wire.write(regID >> 8);
-    Wire.write(regID & 0x00FF);
-    Wire.endTransmission();
-    Wire.requestFrom((sensor_addr >> 1), 1);
-    if (Wire.available()) {
-        *regDat = Wire.read();
-    }
-    delay(1);
-    return 1;
-}
-
-//I2C Write 16bit address, 16bit data
-byte ArduCAM_Mini_2MP::wrSensorReg16_16(int regID, int regDat)
-{
-    Wire.beginTransmission(sensor_addr >> 1);
-    Wire.write(regID >> 8);            // sends instruction byte, MSB first
-    Wire.write(regID & 0x00FF);
-    Wire.write(regDat >> 8);            // sends data byte, MSB first
-    Wire.write(regDat & 0x00FF);
-    if (Wire.endTransmission()) {
-        return 0;
-    }
-    delay(1);
-    return (1);
-}
-
-//I2C Read 16bit address, 16bit data
-byte ArduCAM_Mini_2MP::rdSensorReg16_16(uint16_t regID, uint16_t* regDat)
-{
-    uint16_t temp;
-    Wire.beginTransmission(sensor_addr >> 1);
-    Wire.write(regID >> 8);
-    Wire.write(regID & 0x00FF);
-    Wire.endTransmission();
-    Wire.requestFrom((sensor_addr >> 1), 2);
-    if (Wire.available()) {
-        temp = Wire.read();
-        *regDat = (temp << 8) | Wire.read();
-    }
-    delay(1);
-    return (1);
 }
