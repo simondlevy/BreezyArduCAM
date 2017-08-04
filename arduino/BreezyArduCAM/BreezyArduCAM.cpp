@@ -262,9 +262,6 @@ void ArduCAM_Mini_2MP::grabRawFrame(uint32_t length)
             delayMicroseconds(12);
         }
     }
-
-    sendByte(0xBB);
-    sendByte(0xCC);
 }
 
 void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
