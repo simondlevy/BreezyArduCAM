@@ -92,12 +92,12 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 /* Public methods                                   */
 /****************************************************/
 
-ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int CS)
+ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs)
 {
-    P_CS  = portOutputRegister(digitalPinToPort(CS));
-    B_CS  = digitalPinToBitMask(CS);
+    P_CS  = portOutputRegister(digitalPinToPort(cs));
+    B_CS  = digitalPinToBitMask(cs);
 
-    pinMode(CS, OUTPUT);
+    pinMode(cs, OUTPUT);
     sbi(P_CS, B_CS);
     sensor_addr = 0x60;
 }
