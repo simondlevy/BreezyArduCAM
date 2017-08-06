@@ -31,7 +31,7 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
-SCALEDOWN = 0          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
+SCALEDOWN = 2          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
 
 BAUD = 921600   # Arduino Uno
 
@@ -48,12 +48,15 @@ def dump(msg):
 
 if __name__ == '__main__':
 
-    image = np.zeros((240>>SCALEDOWN, 320>>SCALEDOWN)).astype('uint8')
+    # Base is 320x240 image
+    w = 320 >> SCALEDOWN
+    h = 240 >> SCALEDOWN
+
+    # Create an empty grayscale image
+    image = np.zeros((h, w)).astype('uint8')
 
     # Open connection to Arduino with a timeout of two seconds
     port = serial.Serial(PORT, BAUD, timeout=2)
-
-    dump('Starting capture ...')
 
     # Validate startup message
     ackcheck(port, 'SPI interface OK.')
@@ -61,12 +64,14 @@ if __name__ == '__main__':
     # Wait a spell
     time.sleep(0.2)
 
+    dump('Starting capture ...')
+
     # Send "start capture" message
     sendbyte(port, 1)
 
     # Read bytes from serial and write them to file
-    for j in range(240>>SCALEDOWN):
-        for k in range(320>>SCALEDOWN):
+    for j in range(h):
+        for k in range(w):
             bl = ord(port.read())  # low byte
             bh = ord(port.read())  # high byte
             rgb = (bh<<8)+bl

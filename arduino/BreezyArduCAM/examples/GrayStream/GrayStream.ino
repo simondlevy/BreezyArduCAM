@@ -23,7 +23,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <SPI.h>
 
 // Use scale-down factor 2^2 = 4
-static const uint8_t SCALEDOWN = 0;
+static const uint8_t SCALEDOWN = 2;
 
 // set pin 10 as the slave select for the digital pot:
 static const int CS = 10;
