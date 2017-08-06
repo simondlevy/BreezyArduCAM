@@ -29,6 +29,8 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
+SCALEDOWN = 0          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
+
 BAUD = 921600   # Arduino Uno
 
 OUTFILENAME = 'test.bmp'
@@ -76,7 +78,7 @@ if __name__ == '__main__':
     outfile.write(bytearray(header))
 
     # Read bytes from serial and write them to file
-    for k in range(320*240*2):
+    for k in range((320>>SCALEDOWN)*(240>>SCALEDOWN)*2):
         c = outfile.write(port.read())
 
     # Send "stop" message
