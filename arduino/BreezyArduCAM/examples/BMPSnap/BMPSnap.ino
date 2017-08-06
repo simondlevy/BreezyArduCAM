@@ -36,11 +36,11 @@ void setup(void)
     // Talk to Arduino at fastest possible baud rate
     Serial.begin(921600);
 
-    // Change to QVGA capture mode and initialize the OV5642 module
+    // Begin capturing in  QVGA mode
     myCam.beginQvga();
 }
 
 void loop(void) 
 {
-    myCam.captureQvga();
+    myCam.capture();
 }

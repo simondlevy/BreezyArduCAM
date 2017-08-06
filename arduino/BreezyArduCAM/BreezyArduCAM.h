@@ -105,14 +105,11 @@ class ArduCAM_Mini_2MP
         void beginJpeg1600x1200(void);
 
         /**
-         * Runs in Arduino loop() function to capture JPEG bytes.
+         * Runs in Arduino loop() function to capture bytes.
+         * Calls gotStartRequest(), gotStopRequest(), and sendByte() methods
+         * of implementing class.
          */
-        void captureJpeg(void);
-
-        /**
-          Runs in Arduino loop() function to capture raw image bytes.
-         */
-        void captureQvga(void);
+        void capture(void);
 
     protected:
 
@@ -138,8 +135,6 @@ class ArduCAM_Mini_2MP
 
         void csHigh(void);
         void csLow(void);
-
-        void capture(bool useJpeg);
 
         void grabJpegFrame(uint32_t length);
         void grabQvgaFrame(uint32_t length);
@@ -174,6 +169,7 @@ class ArduCAM_Mini_2MP
         regsize B_CS;
         byte sensor_addr;
 
+        bool usingJpeg;
         bool capturing;
         bool starting;
 };

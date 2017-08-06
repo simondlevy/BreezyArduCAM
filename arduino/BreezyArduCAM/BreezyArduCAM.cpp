@@ -100,12 +100,13 @@ ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs)
     pinMode(cs, OUTPUT);
     sbi(P_CS, B_CS);
     sensor_addr = 0x60;
+    usingJpeg = false;
 }
 
 void ArduCAM_Mini_2MP::beginQvga(void)
 {
+    usingJpeg = false;
     begin();
-
     wrSensorRegs8_8(OV2640_QVGA);
 }
 
@@ -154,7 +155,7 @@ void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
     beginJpeg(OV2640_1600x1200_JPEG);
 }
 
-void ArduCAM_Mini_2MP::captureJpeg(void)
+void ArduCAM_Mini_2MP::capture(void)
 {
     // Wait for start bit from host
     if (gotStartRequest()) {
@@ -171,56 +172,41 @@ void ArduCAM_Mini_2MP::captureJpeg(void)
             return;
         }
 
-        capture(true);
-    }
-}
+        if (starting) {
+            flush_fifo();
+            clear_fifo_flag();
+            start_capture();
+            starting = false;
+        }
 
-void ArduCAM_Mini_2MP::captureQvga(void)
-{
-    if (gotStartRequest()) {
-        starting = true;
-    }
+        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
 
-    capture(false);
+            uint32_t length = read_fifo_length();
+
+            if (length >= MAX_FIFO_SIZE || length == 0) {
+                clear_fifo_flag();
+                starting = true;
+                return;
+            }
+
+            csLow();
+            set_fifo_burst();
+            SPI.transfer(0x00);
+
+            if (usingJpeg)
+                grabJpegFrame(length);
+            else
+                grabQvgaFrame(length);
+
+            csHigh();
+            clear_fifo_flag();
+        }
+    }
 }
 
 /****************************************************/
 /* Private methods                                  */
 /****************************************************/
-
-void ArduCAM_Mini_2MP::capture(bool useJpeg)
-{
-
-    if (starting) {
-        flush_fifo();
-        clear_fifo_flag();
-        start_capture();
-        starting = false;
-    }
-
-    if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
-
-        uint32_t length = read_fifo_length();
-
-        if (length >= MAX_FIFO_SIZE || length == 0) {
-            clear_fifo_flag();
-            starting = true;
-            return;
-        }
-
-        csLow();
-        set_fifo_burst();
-        SPI.transfer(0x00);
-
-        if (useJpeg)
-            grabJpegFrame(length);
-        else
-            grabQvgaFrame(length);
-
-        csHigh();
-        clear_fifo_flag();
-    }
-}
 
 void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
 {
@@ -266,6 +252,8 @@ void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
 
 void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
 {
+    usingJpeg = true;
+
     begin();
 
     wrSensorRegs8_8(OV2640_JPEG_INIT);
