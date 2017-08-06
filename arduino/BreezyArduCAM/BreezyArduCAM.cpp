@@ -243,7 +243,6 @@ void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
             char VH = SPI.transfer(0x00);;
             char VL = SPI.transfer(0x00);;
             sendByte(VL);
-            delayMicroseconds(12);
             sendByte(VH);
             delayMicroseconds(12);
         }
