@@ -35,7 +35,17 @@ BAUD = 921600   # Arduino Uno
 
 OUTFILENAME = 'test.bmp'
 
+# helpers  --------------------------------------------------------------------------
+
+def num2bytes(n):
+    return [n&0xFF, (n>>8)&0xFF, (n>>16)&0xFF, (n>>24)&0XFF]
+
+def dump(msg):
+    stdout.write(msg)
+    stdout.flush()
+
 # BMP header for 320x240 imagel ------------------------------------------------------
+#
 # See: http://www.fastgraph.com/help/bmp_header_format.html
 # See: https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png
 
@@ -51,7 +61,7 @@ header = [
     0x01, 0x00,             # number of planes in the image, must be 1
     0x10, 0x00,             # number of bits per pixel
     0x03, 0x00, 0x00, 0x00, # compression type
-    0x00, 0x58, 0x02, 0x00, # size of image data in bytes (including padding)
+    0x00, 0x58, 0x02, 0x00, # size of image data in bytes (including padding) *
     0xC4, 0x0E, 0x00, 0x00, # horizontal resolution in pixels per meter (unreliable)
     0xC4, 0x0E, 0x00, 0x00, # vertical resolution in pixels per meter (unreliable)
     0x00, 0x00, 0x00, 0x00, # number of colors in image, or zero
@@ -61,11 +71,14 @@ header = [
     0x1F, 0x00, 0x00, 0x00  # blue channel bitmask
 ]
 
-# helpers  --------------------------------------------------------------------------
+# header modification for different image sizes -------------------------------------
 
-def dump(msg):
-    stdout.write(msg)
-    stdout.flush()
+width  = 320 >> SCALEDOWN
+height = 240 >> SCALEDOWN
+
+header[18:22] = num2bytes(width)
+header[22:26] = num2bytes(height)
+header[34:38] = num2bytes(width*height*2)
 
 # main ------------------------------------------------------------------------------
 
