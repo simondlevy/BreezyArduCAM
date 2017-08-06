@@ -36,7 +36,8 @@ BAUD = 921600   # Arduino Uno
 OUTFILENAME = 'test.bmp'
 
 # BMP header for 320x240 imagel ------------------------------------------------------
-# See http://www.fastgraph.com/help/bmp_header_format.html
+# See: http://www.fastgraph.com/help/bmp_header_format.html
+# See: https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png
 
 header = [
     0x42, 0x4D,             # signature, must be 4D42 hex
@@ -55,8 +56,9 @@ header = [
     0xC4, 0x0E, 0x00, 0x00, # vertical resolution in pixels per meter (unreliable)
     0x00, 0x00, 0x00, 0x00, # number of colors in image, or zero
     0x00, 0x00, 0x00, 0x00, # number of important colors, or zero
-    0x00, 0xF8, 0x00, 0x00, 0xE0, 0x07, 0x00, 0x00, 0x1F, 0x00,
-    0x00, 0x00
+    0x00, 0xF8, 0x00, 0x00, # red channel bitmask
+    0xE0, 0x07, 0x00, 0x00, # green channel bitmask
+    0x1F, 0x00, 0x00, 0x00  # blue channel bitmask
 ]
 
 # helpers  --------------------------------------------------------------------------
