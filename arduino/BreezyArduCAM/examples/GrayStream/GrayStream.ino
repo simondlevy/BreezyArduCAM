@@ -22,6 +22,9 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <BreezyArduCAM.h>
 #include <SPI.h>
 
+// Use scale-down factor 2^2 = 4
+static const uint8_t SCALEDOWN = 2;
+
 // set pin 10 as the slave select for the digital pot:
 static const int CS = 10;
 
@@ -36,8 +39,8 @@ void setup(void)
     // Talk to Arduino at fastest possible baud rate
     Serial.begin(921600);
 
-    // Begin capturing in  QVGA mode, scale-down factor 2^1 = 2
-    myCam.beginQvga(2);
+    // Begin capturing in  QVGA mode, scale-down factor 2^2 = 4
+    myCam.beginQvga(SCALEDOWN);
 }
 
 void loop(void) 

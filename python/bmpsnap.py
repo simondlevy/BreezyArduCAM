@@ -29,8 +29,6 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
-SCALEDOWN = 1          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
-
 BAUD = 921600   # Arduino Uno
 
 OUTFILENAME = 'test.bmp'
@@ -68,17 +66,8 @@ header = [
     0x00, 0x00, 0x00, 0x00, # number of important colors, or zero
     0x00, 0xF8, 0x00, 0x00, # red channel bitmask
     0xE0, 0x07, 0x00, 0x00, # green channel bitmask
-    0xE0, 0x07, 0x00, 0x00  # blue channel bitmask
+    0x1F, 0x00, 0x00, 0x00  # blue channel bitmask
 ]
-
-# header modification for different image sizes -------------------------------------
-
-width  = 320 >> SCALEDOWN
-height = 240 >> SCALEDOWN
-
-header[18:22] = num2bytes(width)
-header[22:26] = num2bytes(height)
-header[34:38] = num2bytes(width*height*2)
 
 # main ------------------------------------------------------------------------------
 
@@ -107,7 +96,7 @@ if __name__ == '__main__':
     outfile.write(bytearray(header))
 
     # Read bytes from serial and write them to file
-    for k in range((320>>SCALEDOWN)*(240>>SCALEDOWN)*2):
+    for k in range(320*240*2):
         c = outfile.write(port.read())
 
     # Send "stop" message
