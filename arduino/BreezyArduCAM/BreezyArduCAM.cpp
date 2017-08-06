@@ -240,11 +240,11 @@ void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
 
     for (int i = 0; i < 240; i++) {
         for (int j = 0; j < 320; j++) {
-            char VH = SPI.transfer(0x00);;
-            char VL = SPI.transfer(0x00);;
+            uint8_t hi = SPI.transfer(0x00);;
+            uint8_t lo = SPI.transfer(0x00);;
             if (!(i%scaledown) && !(j%scaledown)) {
-                sendByte(VL);
-                sendByte(VH);
+                sendByte(lo);
+                sendByte(hi);
                 delayMicroseconds(12);
             }
         }
