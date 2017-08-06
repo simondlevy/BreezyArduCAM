@@ -21,6 +21,8 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 import time
 import serial
 from sys import stdout
+import numpy as np
+import cv2
 
 from helpers import *
 
@@ -29,11 +31,9 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
-SCALEDOWN = 2          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
+SCALEDOWN = 0          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
 
 BAUD = 921600   # Arduino Uno
-
-OUTFILENAME = 'test.bmp'
 
 # helpers  --------------------------------------------------------------------------
 
@@ -44,45 +44,11 @@ def dump(msg):
     stdout.write(msg)
     stdout.flush()
 
-# BMP header for 320x240 imagel ------------------------------------------------------
-#
-# See: http://www.fastgraph.com/help/bmp_header_format.html
-# See: https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png
-
-header = [
-    0x42, 0x4D,             # signature, must be 4D42 hex
-    0x36, 0x58, 0x02, 0x00, # size of BMP file in bytes (unreliable)
-    0x00, 0x00,             # reserved, must be zero
-    0x00, 0x00,             # reserved, must be zero
-    0x42, 0x00, 0x00, 0x00, # offset to start of image data in bytes
-    0x28, 0x00, 0x00, 0x00, # size of BITMAPINFOHEADER structure, must be 40
-    0x40, 0x01, 0x00, 0x00, # image width in pixels
-    0xF0, 0x00, 0x00, 0x00, # image height in pixels
-    0x01, 0x00,             # number of planes in the image, must be 1
-    0x10, 0x00,             # number of bits per pixel
-    0x03, 0x00, 0x00, 0x00, # compression type
-    0x00, 0x58, 0x02, 0x00, # size of image data in bytes (including padding)
-    0xC4, 0x0E, 0x00, 0x00, # horizontal resolution in pixels per meter (unreliable)
-    0xC4, 0x0E, 0x00, 0x00, # vertical resolution in pixels per meter (unreliable)
-    0x00, 0x00, 0x00, 0x00, # number of colors in image, or zero
-    0x00, 0x00, 0x00, 0x00, # number of important colors, or zero
-    0x00, 0xF8, 0x00, 0x00, # red channel bitmask
-    0xE0, 0x07, 0x00, 0x00, # green channel bitmask
-    0x1F, 0x00, 0x00, 0x00  # blue channel bitmask
-]
-
-# header modification for different image sizes -------------------------------------
-
-width  = 320 >> SCALEDOWN
-height = 240 >> SCALEDOWN
-
-header[18:22] = num2bytes(width)
-header[22:26] = num2bytes(height)
-header[34:38] = num2bytes(width*height*2)
-
 # main ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+
+    image = np.zeros((240>>SCALEDOWN, 320>>SCALEDOWN)).astype('uint8')
 
     # Open connection to Arduino with a timeout of two seconds
     port = serial.Serial(PORT, BAUD, timeout=2)
@@ -98,23 +64,25 @@ if __name__ == '__main__':
     # Send "start capture" message
     sendbyte(port, 1)
 
-    dump('\nWriting file %s (will appear upside-down) ...' % OUTFILENAME)
-
-    # Open output file
-    outfile = open(OUTFILENAME, 'wb')
-
-    # Write BMP header
-    outfile.write(bytearray(header))
-
     # Read bytes from serial and write them to file
-    for k in range((320>>SCALEDOWN)*(240>>SCALEDOWN)*2):
-        c = outfile.write(port.read())
+    for j in range(240>>SCALEDOWN):
+        for k in range(320>>SCALEDOWN):
+            bl = ord(port.read())  # low byte
+            bh = ord(port.read())  # high byte
+            rgb = (bh<<8)+bl
+            r = (rgb & 0xF800) >> 11
+            g = (rgb & 0x07E0) >> 5
+            b = rgb & 0x001F
+            image[j,k] = int(0.21*r + 0.72*g + 0.07*b)
 
     # Send "stop" message
     sendbyte(port, 0)
 
-    # Close output file
-    outfile.close()
-
     print('\nDone')
+
+    while True:
+
+       cv2.imshow("ArduCAM", image)
+       if cv2.waitKey(1) == 27:
+           break
 
