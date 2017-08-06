@@ -29,7 +29,7 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
-SCALEDOWN = 0          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
+SCALEDOWN = 1          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
 
 BAUD = 921600   # Arduino Uno
 
@@ -61,7 +61,7 @@ header = [
     0x01, 0x00,             # number of planes in the image, must be 1
     0x10, 0x00,             # number of bits per pixel
     0x03, 0x00, 0x00, 0x00, # compression type
-    0x00, 0x58, 0x02, 0x00, # size of image data in bytes (including padding) *
+    0x00, 0x58, 0x02, 0x00, # size of image data in bytes (including padding)
     0xC4, 0x0E, 0x00, 0x00, # horizontal resolution in pixels per meter (unreliable)
     0xC4, 0x0E, 0x00, 0x00, # vertical resolution in pixels per meter (unreliable)
     0x00, 0x00, 0x00, 0x00, # number of colors in image, or zero

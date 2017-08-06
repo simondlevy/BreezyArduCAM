@@ -37,7 +37,7 @@ void setup(void)
     Serial.begin(921600);
 
     // Begin capturing in  QVGA mode
-    myCam.beginQvga();
+    myCam.beginQvga(1);
 }
 
 void loop(void) 
