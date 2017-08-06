@@ -184,7 +184,7 @@ class Serial_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
     public:
 
         /**
-         * Constructs a Seiral_ArduCAM_Mini_2MP object.
+         * Constructs a Serial_ArduCAM_Mini_2MP object.
          * @param cs pin for Chip Select signal
          */
         Serial_ArduCAM_Mini_2MP(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
