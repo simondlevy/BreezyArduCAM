@@ -58,8 +58,9 @@ class ArduCAM_Mini_2MP
         /**
          * Begins capture in QVGA (raw) mode.
          * @param scaledown logarithm of 2 by which to scale down image
+         * @param grayscale flag for grayscale conversion
          */
-        void beginQvga(uint8_t scaledown=0);
+        void beginQvga(uint8_t scaledown=0, bool grayscale=false);
 
         /**
          * Begins 160x120 JPEG capture.
@@ -171,6 +172,7 @@ class ArduCAM_Mini_2MP
         byte sensor_addr;
 
         uint8_t scaledown;
+        bool grayscale;
         bool usingJpeg;
         bool capturing;
         bool starting;

@@ -103,9 +103,11 @@ ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs)
     usingJpeg = false;
 }
 
-void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown)
+void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown, bool _grayscale)
 {
     scaledown = 1 << _scaledown;
+    grayscale = _grayscale;
+
     begin();
     wrSensorRegs8_8(OV2640_QVGA);
 }
@@ -243,8 +245,18 @@ void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
             uint8_t hi = SPI.transfer(0x00);;
             uint8_t lo = SPI.transfer(0x00);;
             if (!(i%scaledown) && !(j%scaledown)) {
-                sendByte(lo);
-                sendByte(hi);
+                if (grayscale) {
+                    uint16_t rgb = (((uint16_t)hi)<<8) + (uint16_t)lo;
+                    uint16_t r = (rgb & 0xF800) >> 11;
+                    uint16_t g = (rgb & 0x07E0) >> 5;
+                    uint16_t b = rgb & 0x001F;
+                    uint8_t gray = (uint8_t)(0.21*r + 0.72*g + 0.07*b);
+                    sendByte(gray);
+                }
+                else {
+                    sendByte(lo);
+                    sendByte(hi);
+                }
                 delayMicroseconds(12);
             }
         }

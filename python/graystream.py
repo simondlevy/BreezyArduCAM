@@ -55,6 +55,8 @@ if __name__ == '__main__':
     # Create an empty grayscale image
     image = np.zeros((h, w)).astype('uint8')
 
+    dump('Connecting to camera...')
+
     # Open connection to Arduino with a timeout of two seconds
     port = serial.Serial(PORT, BAUD, timeout=2)
 
@@ -64,30 +66,23 @@ if __name__ == '__main__':
     # Wait a spell
     time.sleep(0.2)
 
-    dump('Starting capture ...')
+    dump('\nStarting capture ...')
 
     # Send "start capture" message
     sendbyte(port, 1)
 
-    # Read bytes from serial and write them to file
     for j in range(h):
-        for k in range(w):
-            bl = ord(port.read())  # low byte
-            bh = ord(port.read())  # high byte
-            rgb = (bh<<8)+bl
-            r = (rgb & 0xF800) >> 11
-            g = (rgb & 0x07E0) >> 5
-            b = rgb & 0x001F
-            image[j,k] = int(0.21*r + 0.72*g + 0.07*b)
+       for k in range(w):
+           b = port.read()
+           image[j,k] = ord(b)
 
-    # Send "stop" message
     sendbyte(port, 0)
-
-    print('\nDone')
 
     while True:
 
        cv2.imshow("ArduCAM", image)
+
        if cv2.waitKey(1) == 27:
            break
+
 

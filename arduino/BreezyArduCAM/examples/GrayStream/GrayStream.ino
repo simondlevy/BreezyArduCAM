@@ -39,8 +39,8 @@ void setup(void)
     // Talk to Arduino at fastest possible baud rate
     Serial.begin(921600);
 
-    // Begin capturing in  QVGA mode, scale-down factor 2^2 = 4
-    myCam.beginQvga(SCALEDOWN);
+    // Begin capturing in  QVGA mode, scale-down factor 2^2 = 4, grayscale flagged
+    myCam.beginQvga(SCALEDOWN, true);
 }
 
 void loop(void) 
