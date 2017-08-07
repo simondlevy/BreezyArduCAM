@@ -251,7 +251,7 @@ void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
                     uint16_t g = (rgb & 0x07E0) >> 5;
                     uint16_t b = rgb & 0x001F;
                     uint8_t gray = (uint8_t)(0.21*r + 0.72*g + 0.07*b);
-                    sendByte(gray);
+                    sendByte(gray*2);
                 }
                 else {
                     sendByte(lo);

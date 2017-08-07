@@ -31,7 +31,7 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
-SCALEDOWN = 0          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
+SCALEDOWN = 1          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
 
 BAUD = 921600   # Arduino Uno
 
@@ -66,10 +66,10 @@ if __name__ == '__main__':
     # Wait a spell
     time.sleep(0.2)
 
-    dump('\nStarting capture ...')
-
     # Send "start capture" message
     sendbyte(port, 1)
+
+    dump('\nStarting capture ...')
 
     for j in range(h):
        for k in range(w):
