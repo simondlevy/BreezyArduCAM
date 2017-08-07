@@ -71,18 +71,20 @@ if __name__ == '__main__':
 
     dump('\nStarting capture ...')
 
-    for j in range(h):
-       for k in range(w):
-           b = port.read()
-           image[j,k] = ord(b)
-
-    sendbyte(port, 0)
-
     while True:
 
-       cv2.imshow("ArduCAM", image)
+        # Grab image bytes and put them in image array
+        for j in range(h):
+            for k in range(w):
+                image[j,k] = ord(port.read())
 
-       if cv2.waitKey(1) == 27:
-           break
+        # Restart the capture
+        sendbyte(port, 1)
 
+        # Display the image
+        cv2.imshow("ArduCAM", image)
+        if cv2.waitKey(1) == 27:
+            break
+
+    sendbyte(port, 0)
 
