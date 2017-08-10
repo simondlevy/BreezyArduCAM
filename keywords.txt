@@ -1,0 +1,19 @@
+ArduCAM_Mini_2MP            KEYWORD1
+Serial_ArduCAM_Mini_2MP     KEYWORD1
+beginQvga	                KEYWORD2
+beginJpeg160x120	        KEYWORD2
+beginJpeg176x144	        KEYWORD2
+beginJpeg320x240	        KEYWORD2
+beginJpeg352x288	        KEYWORD2
+beginJpeg640x480	        KEYWORD2
+beginJpeg800x600	        KEYWORD2
+beginJpeg1024x768	        KEYWORD2
+beginJpeg1280x1024	        KEYWORD2
+beginJpeg1600x1200	        KEYWORD2
+gotStartRequest             KEYWORD2
+gotStopRequest              KEYWORD2
+sendByte                    KEYWORD2
+
+
+
+ 
