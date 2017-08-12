@@ -47,6 +47,8 @@ class ArduCAM_Mini {
 
     protected:
 
+        ArduCAM_Mini(uint8_t sensor_addr, uint8_t cs);
+
         void csHigh(void);
         void csLow(void);
 

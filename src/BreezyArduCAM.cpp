@@ -90,19 +90,23 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 //Define maximum frame buffer size
 #define MAX_FIFO_SIZE		    0x5FFFF //384KByte
 
-
-/****************************************************/
-/* Public methods                                   */
-/****************************************************/
-
-ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs)
+ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs)
 {
     P_CS  = portOutputRegister(digitalPinToPort(cs));
     B_CS  = digitalPinToBitMask(cs);
 
     pinMode(cs, OUTPUT);
     sbi(P_CS, B_CS);
-    sensor_addr = 0x60;
+    sensor_addr = addr;
+}
+
+
+/****************************************************/
+/* Public methods                                   */
+/****************************************************/
+
+ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs) : ArduCAM_Mini(0x60, cs)
+{
     usingJpeg = false;
 }
 
