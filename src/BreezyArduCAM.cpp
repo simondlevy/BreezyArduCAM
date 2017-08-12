@@ -23,6 +23,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "BreezyArduCAM.h"
 
 #include "ov2640_regs.h"
+#include "ov5642_regs.h"
 
 #include <Wire.h>
 #include <SPI.h>
