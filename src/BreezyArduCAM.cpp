@@ -280,6 +280,7 @@ void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
 
     wrSensorRegs8_8(reglist);
 }
+
 void ArduCAM_Mini_2MP::begin()
 {
     // Check if the ArduCAM SPI bus is OK
@@ -305,22 +306,24 @@ void ArduCAM_Mini_2MP::begin()
     delay(100);
 }
 
-void ArduCAM_Mini_2MP::flush_fifo(void)
+// ------------------------------------------------------------------------------------------
+
+void ArduCAM_Mini::flush_fifo(void)
 {
     write_reg(ARDUCHIP_FIFO, FIFO_CLEAR_MASK);
 }
 
-void ArduCAM_Mini_2MP::start_capture(void)
+void ArduCAM_Mini::start_capture(void)
 {
     write_reg(ARDUCHIP_FIFO, FIFO_START_MASK);
 }
 
-void ArduCAM_Mini_2MP::clear_fifo_flag(void )
+void ArduCAM_Mini::clear_fifo_flag(void )
 {
     write_reg(ARDUCHIP_FIFO, FIFO_CLEAR_MASK);
 }
 
-uint32_t ArduCAM_Mini_2MP::read_fifo_length(void)
+uint32_t ArduCAM_Mini::read_fifo_length(void)
 {
     uint32_t len1,len2,len3,length=0;
     len1 = read_reg(FIFO_SIZE1);
@@ -330,48 +333,48 @@ uint32_t ArduCAM_Mini_2MP::read_fifo_length(void)
     return length;	
 }
 
-void ArduCAM_Mini_2MP::set_fifo_burst()
+void ArduCAM_Mini::set_fifo_burst()
 {
     SPI.transfer(BURST_FIFO_READ);
 }
 
-void ArduCAM_Mini_2MP::csHigh(void)
+void ArduCAM_Mini::csHigh(void)
 {
     sbi(P_CS, B_CS);	
 }
-void ArduCAM_Mini_2MP::csLow(void)
+void ArduCAM_Mini::csLow(void)
 {
     cbi(P_CS, B_CS);	
 }
 
-uint8_t ArduCAM_Mini_2MP::read_fifo(void)
+uint8_t ArduCAM_Mini::read_fifo(void)
 {
     uint8_t data;
     data = bus_read(SINGLE_FIFO_READ);
     return data;
 }
 
-uint8_t ArduCAM_Mini_2MP::read_reg(uint8_t addr)
+uint8_t ArduCAM_Mini::read_reg(uint8_t addr)
 {
     uint8_t data;
     data = bus_read(addr & 0x7F);
     return data;
 }
 
-void ArduCAM_Mini_2MP::write_reg(uint8_t addr, uint8_t data)
+void ArduCAM_Mini::write_reg(uint8_t addr, uint8_t data)
 {
     bus_write(addr | 0x80, data);
 }
 
 //Set corresponding bit  
-void ArduCAM_Mini_2MP::set_bit(uint8_t addr, uint8_t bit)
+void ArduCAM_Mini::set_bit(uint8_t addr, uint8_t bit)
 {
     uint8_t temp;
     temp = read_reg(addr);
     write_reg(addr, temp | bit);
 }
 //Clear corresponding bit 
-void ArduCAM_Mini_2MP::clear_bit(uint8_t addr, uint8_t bit)
+void ArduCAM_Mini::clear_bit(uint8_t addr, uint8_t bit)
 {
     uint8_t temp;
     temp = read_reg(addr);
@@ -379,7 +382,7 @@ void ArduCAM_Mini_2MP::clear_bit(uint8_t addr, uint8_t bit)
 }
 
 //Get corresponding bit status
-uint8_t ArduCAM_Mini_2MP::get_bit(uint8_t addr, uint8_t bit)
+uint8_t ArduCAM_Mini::get_bit(uint8_t addr, uint8_t bit)
 {
     uint8_t temp;
     temp = read_reg(addr);
@@ -387,7 +390,7 @@ uint8_t ArduCAM_Mini_2MP::get_bit(uint8_t addr, uint8_t bit)
     return temp;
 }
 
-uint8_t ArduCAM_Mini_2MP::bus_write(int address,int value)
+uint8_t ArduCAM_Mini::bus_write(int address,int value)
 {	
     cbi(P_CS, B_CS);
     SPI.transfer(address);
@@ -396,7 +399,7 @@ uint8_t ArduCAM_Mini_2MP::bus_write(int address,int value)
     return 1;
 }
 
-uint8_t ArduCAM_Mini_2MP:: bus_read(int address)
+uint8_t ArduCAM_Mini:: bus_read(int address)
 {
     uint8_t value;
     cbi(P_CS, B_CS);
@@ -408,7 +411,7 @@ uint8_t ArduCAM_Mini_2MP:: bus_read(int address)
 }
 
 // Write 8 bit values to 8 bit register address
-int ArduCAM_Mini_2MP::wrSensorRegs8_8(const struct sensor_reg reglist[])
+int ArduCAM_Mini::wrSensorRegs8_8(const struct sensor_reg reglist[])
 {
     //int err = 0;
     uint16_t reg_addr = 0;
@@ -426,7 +429,7 @@ int ArduCAM_Mini_2MP::wrSensorRegs8_8(const struct sensor_reg reglist[])
 
 // Write 8 bit values to 16 bit register address
 // Read/write 8 bit value to/from 8 bit register address	
-byte ArduCAM_Mini_2MP::wrSensorReg8_8(int regID, int regDat)
+byte ArduCAM_Mini::wrSensorReg8_8(int regID, int regDat)
 {
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID & 0x00FF);
@@ -438,7 +441,7 @@ byte ArduCAM_Mini_2MP::wrSensorReg8_8(int regID, int regDat)
     return 1;
 
 }
-byte ArduCAM_Mini_2MP::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
+byte ArduCAM_Mini::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
 {	
     Wire.beginTransmission(sensor_addr >> 1);
     Wire.write(regID & 0x00FF);

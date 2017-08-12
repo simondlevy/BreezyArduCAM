@@ -41,10 +41,47 @@ struct sensor_reg {
 };
 
 /**
+ * An abstract class for the ArduCAM Mini.  
+ */
+class ArduCAM_Mini {
+
+    protected:
+
+        void csHigh(void);
+        void csLow(void);
+
+        void flush_fifo(void);
+        void start_capture(void);
+        void clear_fifo_flag(void);
+        uint8_t read_fifo(void);
+
+        uint8_t read_reg(uint8_t addr);
+        void write_reg(uint8_t addr, uint8_t data);	
+
+        uint32_t read_fifo_length(void);
+        void set_fifo_burst(void);
+
+        void set_bit(uint8_t addr, uint8_t bit);
+        void clear_bit(uint8_t addr, uint8_t bit);
+        uint8_t get_bit(uint8_t addr, uint8_t bit);
+
+        uint8_t bus_write(int address, int value);
+        uint8_t bus_read(int address);	
+
+        int wrSensorRegs8_8(const struct sensor_reg*);
+        byte wrSensorReg8_8(int regID, int regDat);
+        byte rdSensorReg8_8(uint8_t regID, uint8_t* regDat);
+
+        regtype *P_CS;
+        regsize B_CS;
+        byte sensor_addr;
+ };
+
+/**
  * An abstract class for the ArduCAM Mini 2MP.  
  */
-class ArduCAM_Mini_2MP
-{
+class ArduCAM_Mini_2MP : public ArduCAM_Mini {
+
     friend class FrameGrabber;
 
     public:
@@ -135,41 +172,13 @@ class ArduCAM_Mini_2MP
 
     private:
 
-        void csHigh(void);
-        void csLow(void);
-
         void grabJpegFrame(uint32_t length);
         void grabQvgaFrame(uint32_t length);
-
-        void flush_fifo(void);
-        void start_capture(void);
-        void clear_fifo_flag(void);
-        uint8_t read_fifo(void);
-
-        uint8_t read_reg(uint8_t addr);
-        void write_reg(uint8_t addr, uint8_t data);	
-
-        uint32_t read_fifo_length(void);
-        void set_fifo_burst(void);
-
-        void set_bit(uint8_t addr, uint8_t bit);
-        void clear_bit(uint8_t addr, uint8_t bit);
-        uint8_t get_bit(uint8_t addr, uint8_t bit);
-
-        uint8_t bus_write(int address, int value);
-        uint8_t bus_read(int address);	
-
-        int wrSensorRegs8_8(const struct sensor_reg*);
-        byte wrSensorReg8_8(int regID, int regDat);
-        byte rdSensorReg8_8(uint8_t regID, uint8_t* regDat);
 
         void begin();
 
         void beginJpeg(const struct sensor_reg reglist[]);
 
-        regtype *P_CS;
-        regsize B_CS;
-        byte sensor_addr;
 
         uint8_t scaledown;
         bool grayscale;
