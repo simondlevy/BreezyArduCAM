@@ -219,6 +219,4 @@ class Serial_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
         }
 };
 
-#include "ov2640_regs.h"
-
 #endif
