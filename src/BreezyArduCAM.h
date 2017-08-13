@@ -33,6 +33,77 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define regsize uint32_t
 #endif
 
+// XXX this stuff should eventually go in .cpp ====================================================
+#define BMP 	0
+#define JPEG	1
+
+#define OV5642_320x240 		0	//320x240
+#define OV5642_640x480		1	//640x480
+#define OV5642_1024x768		2	//1024x768
+#define OV5642_1280x960 	3	//1280x960
+#define OV5642_1600x1200	4	//1600x1200
+#define OV5642_2048x1536	5	//2048x1536
+#define OV5642_2592x1944	6	//2592x1944
+
+
+/* Register initialization tables for SENSORs */
+/* Terminating list entry for reg */
+#define SENSOR_REG_TERM_8BIT                0xFF
+#define SENSOR_REG_TERM_16BIT               0xFFFF
+/* Terminating list entry for val */
+#define SENSOR_VAL_TERM_8BIT                0xFF
+#define SENSOR_VAL_TERM_16BIT               0xFFFF
+
+//Define maximum frame buffer size
+#if (defined OV2640_MINI_2MP)
+#define MAX_FIFO_SIZE		0x5FFFF			//384KByte
+#elif (defined OV5642_MINI_5MP || defined OV5642_MINI_5MP_BIT_ROTATION_FIXED || defined ARDUCAM_SHIELD_REVC)
+#define MAX_FIFO_SIZE		0x7FFFF			//512KByte
+#else
+#define MAX_FIFO_SIZE		0x7FFFFF		//8MByte
+#endif 
+
+/****************************************************/
+/* ArduChip registers definition 											*/
+/****************************************************/
+#define ARDUCHIP_TEST1       	0x00  //TEST register
+
+#define ARDUCHIP_FRAMES			  0x01  //FRAME control register, Bit[2:0] = Number of frames to be captured																		//On 5MP_Plus platforms bit[2:0] = 7 means continuous capture until frame buffer is full
+
+#define ARDUCHIP_MODE      		0x02  //Mode register
+#define MCU2LCD_MODE       		0x00
+#define CAM2LCD_MODE       		0x01
+#define LCD2MCU_MODE       		0x02
+
+#define ARDUCHIP_TIM       		0x03  //Timming control
+
+#if !(defined OV2640_MINI_2MP)
+#define HREF_LEVEL_MASK    		0x01  //0 = High active , 		1 = Low active
+#define VSYNC_LEVEL_MASK   		0x02  //0 = High active , 		1 = Low active
+#define LCD_BKEN_MASK      		0x04  //0 = Enable, 					1 = Disable
+#define PCLK_DELAY_MASK  		0x08  //0 = data no delay,		1 = data delayed one PCLK
+#endif
+
+#define ARDUCHIP_FIFO      		0x04  //FIFO and I2C control
+#define FIFO_CLEAR_MASK    		0x01
+#define FIFO_START_MASK    		0x02
+#define FIFO_RDPTR_RST_MASK     0x10
+#define FIFO_WRPTR_RST_MASK     0x20
+
+#define BURST_FIFO_READ			0x3C  //Burst FIFO read operation
+#define SINGLE_FIFO_READ		0x3D  //Single FIFO read operation
+
+#define ARDUCHIP_TRIG      		0x41  //Trigger source
+#define VSYNC_MASK         		0x01
+#define SHUTTER_MASK       		0x02
+#define CAP_DONE_MASK      		0x08
+
+#define FIFO_SIZE1				0x42  //Camera write FIFO size[7:0] for burst to read
+#define FIFO_SIZE2				0x43  //Camera write FIFO size[15:8]
+#define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
+
+// ======================================================================================
+
 
 // a structure for sensor register initialization values
 struct sensor_reg {
@@ -48,6 +119,8 @@ class ArduCAM_Mini {
     protected:
 
         ArduCAM_Mini(uint8_t sensor_addr, uint8_t cs);
+
+    public: // XXX should be protected
 
         void csHigh(void);
         void csLow(void);
@@ -73,11 +146,32 @@ class ArduCAM_Mini {
         int wrSensorRegs8_8(const struct sensor_reg*);
         byte wrSensorReg8_8(int regID, int regDat);
         byte rdSensorReg8_8(uint8_t regID, uint8_t* regDat);
+        byte rdSensorReg16_8(uint16_t regID, uint8_t* regDat);
+
+        int wrSensorRegs16_8(const struct sensor_reg*);
+
+        byte wrSensorReg16_8(int regID, int regDat);
 
         regtype *P_CS;
         regsize B_CS;
         byte sensor_addr;
  };
+
+class ArduCAM_Mini_5MP : public ArduCAM_Mini
+{
+    public:
+
+        ArduCAM_Mini_5MP(uint8_t cs);
+
+        void begin( void );
+
+        void setJpegSize(uint8_t size);
+
+    private:
+
+        byte m_fmt;
+};
+
 
 /**
  * An abstract class for the ArduCAM Mini 2MP.  

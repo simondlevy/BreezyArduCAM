@@ -105,6 +105,74 @@ ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs)
 /* Public methods                                   */
 /****************************************************/
 
+ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs) : ArduCAM_Mini(0x78, cs) 
+{
+}
+
+void ArduCAM_Mini_5MP::begin()
+{
+
+    wrSensorReg16_8(0x3008, 0x80);
+    wrSensorRegs16_8(OV5642_QVGA_Preview);
+    delay(100);
+    if (m_fmt == JPEG)
+    {
+        delay(100);
+        wrSensorRegs16_8(OV5642_JPEG_Capture_QSXGA);
+        wrSensorRegs16_8(ov5642_320x240);
+        wrSensorReg16_8(0x3818, 0xa8);
+        wrSensorReg16_8(0x3621, 0x10);
+        wrSensorReg16_8(0x3801, 0xb0);
+        wrSensorReg16_8(0x4407, 0x04);
+    }
+    else
+    {
+        byte reg_val;
+        wrSensorReg16_8(0x4740, 0x21);
+        wrSensorReg16_8(0x501e, 0x2a);
+        wrSensorReg16_8(0x5002, 0xf8);
+        wrSensorReg16_8(0x501f, 0x01);
+        wrSensorReg16_8(0x4300, 0x61);
+        rdSensorReg16_8(0x3818, &reg_val);
+        wrSensorReg16_8(0x3818, (reg_val | 0x60) & 0xff);
+        rdSensorReg16_8(0x3621, &reg_val);
+        wrSensorReg16_8(0x3621, reg_val & 0xdf);
+    }
+}
+
+void ArduCAM_Mini_5MP::setJpegSize(uint8_t size)
+{
+    uint8_t reg_val;
+
+    switch (size)
+    {
+        case OV5642_320x240:
+            wrSensorRegs16_8(ov5642_320x240);
+            break;
+        case OV5642_640x480:
+            wrSensorRegs16_8(ov5642_640x480);
+            break;
+        case OV5642_1024x768:
+            wrSensorRegs16_8(ov5642_1024x768);
+            break;
+        case OV5642_1280x960:
+            wrSensorRegs16_8(ov5642_1280x960);
+            break;
+        case OV5642_1600x1200:
+            wrSensorRegs16_8(ov5642_1600x1200);
+            break;
+        case OV5642_2048x1536:
+            wrSensorRegs16_8(ov5642_2048x1536);
+            break;
+        case OV5642_2592x1944:
+            wrSensorRegs16_8(ov5642_2592x1944);
+            break;
+        default:
+            wrSensorRegs16_8(ov5642_320x240);
+            break;
+    }
+}
+
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs) : ArduCAM_Mini(0x60, cs)
 {
     usingJpeg = false;
@@ -458,3 +526,56 @@ byte ArduCAM_Mini::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
     return 1;
 
 }
+
+// Write 8 bit values to 16 bit register address
+int ArduCAM_Mini::wrSensorRegs16_8(const struct sensor_reg reglist[])
+{
+    int err = 0;
+    unsigned int reg_addr;
+    unsigned char reg_val;
+    const struct sensor_reg *next = reglist;
+
+    while ((reg_addr != 0xffff) | (reg_val != 0xff))
+    {
+
+        reg_addr = pgm_read_word(&next->reg);
+        reg_val = pgm_read_word(&next->val);
+        err = wrSensorReg16_8(reg_addr, reg_val);
+        //if (!err)
+        //return err;
+        next++;
+    }
+    return 1;
+}
+
+// Read/write 8 bit value to/from 16 bit register address
+byte ArduCAM_Mini::wrSensorReg16_8(int regID, int regDat)
+{
+    Wire.beginTransmission(sensor_addr >> 1);
+    Wire.write(regID >> 8);            // sends instruction byte, MSB first
+    Wire.write(regID & 0x00FF);
+    Wire.write(regDat & 0x00FF);
+    if (Wire.endTransmission())
+    {
+        return 0;
+    }
+    delay(1);
+    return 1;
+}
+
+byte ArduCAM_Mini::rdSensorReg16_8(uint16_t regID, uint8_t* regDat)
+{
+    Wire.beginTransmission(sensor_addr >> 1);
+    Wire.write(regID >> 8);
+    Wire.write(regID & 0x00FF);
+    Wire.endTransmission();
+    Wire.requestFrom((sensor_addr >> 1), 1);
+    if (Wire.available())
+    {
+        *regDat = Wire.read();
+    }
+    delay(1);
+    return 1;
+}
+
+
