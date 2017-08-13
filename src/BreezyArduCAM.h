@@ -116,13 +116,46 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
 
         ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg);
 
-        void beginJpeg(void);
+        /**
+         * Begins 320x240 JPEG capture.
+         */
+        void beginJpeg320x240(void);
 
-        void setJpegSize(uint8_t size);
+        /**
+         * Begins 640x480 JPEG capture.
+         */
+        void beginJpeg640x480(void);
+
+        /**
+         * Begins 1024x768 JPEG capture.
+         */
+        void beginJpeg1024x768(void);
+
+        /**
+         * Begins 1280x960 JPEG capture.
+         */
+        void beginJpeg1280x960(void);
+
+        /**
+         * Begins 1600x1200 JPEG capture.
+         */
+        void beginJpeg1600x1200(void);
+
+        /**
+         * Begins 2048x1536 JPEG capture.
+         */
+        void beginJpeg2048x1536(void);
+
+        /**
+         * Begins 2592x1944 JPEG capture.
+         */
+        void beginJpeg2592x1944(void);
 
     private:
 
-        void begin(void);
+        void beginJpeg(const struct sensor_reg reglist[]);
+
+        void begin(const struct sensor_reg reglist[]);
 };
 
 
@@ -155,6 +188,7 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
          * Begins 176x144 JPEG capture.
          */
         void beginJpeg176x144(void);
+
         /**
          * Begins 320x240 JPEG capture.
          */

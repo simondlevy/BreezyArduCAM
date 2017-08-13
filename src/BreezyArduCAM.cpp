@@ -169,29 +169,62 @@ void ArduCAM_Mini::capture(void)
 }
 
 
-/****************************************************/
-/* Public methods                                   */
-/****************************************************/
-
 ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, 0x7FFFF, cs, fg) 
 {
 }
 
-void ArduCAM_Mini_5MP::beginJpeg(void)
+
+void ArduCAM_Mini_5MP::beginJpeg320x240(void)
+{
+    beginJpeg(ov5642_320x240);
+}
+
+void ArduCAM_Mini_5MP::beginJpeg640x480(void)
+{
+    beginJpeg(ov5642_640x480);
+}
+
+void ArduCAM_Mini_5MP::beginJpeg1024x768(void)
+{
+    beginJpeg(ov5642_1024x768);
+}
+
+void ArduCAM_Mini_5MP::beginJpeg1280x960(void)
+{
+    beginJpeg(ov5642_1280x960);
+}
+
+void ArduCAM_Mini_5MP::beginJpeg1600x1200(void)
+{
+    beginJpeg(ov5642_1600x1200);
+}
+
+void ArduCAM_Mini_5MP::beginJpeg2048x1536(void)
+{
+    beginJpeg(ov5642_2048x1536);
+}
+
+void ArduCAM_Mini_5MP::beginJpeg2592x1944(void)
+{
+    beginJpeg(ov5642_2592x1944);
+}
+
+
+void ArduCAM_Mini_5MP::beginJpeg(const struct sensor_reg reglist[])
 {    
     usingJpeg = true;
 
     // Check SPI connection
     spiCheck();
 
-    begin();
+    begin(reglist);
 
     set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
     clear_fifo_flag();
     write_reg(ARDUCHIP_FRAMES, 0x00);
 }
 
-void ArduCAM_Mini_5MP::begin(void)
+void ArduCAM_Mini_5MP::begin(const struct sensor_reg reglist[])
 {
 
     wrSensorReg16_8(0x3008, 0x80);
@@ -203,7 +236,7 @@ void ArduCAM_Mini_5MP::begin(void)
     {
         delay(100);
         wrSensorRegs16_8(OV5642_JPEG_Capture_QSXGA);
-        wrSensorRegs16_8(ov5642_320x240);
+        wrSensorRegs16_8(reglist);
         wrSensorReg16_8(0x3818, 0xa8);
         wrSensorReg16_8(0x3621, 0x10);
         wrSensorReg16_8(0x3801, 0xb0);
@@ -226,39 +259,6 @@ void ArduCAM_Mini_5MP::begin(void)
 
     capturing = false;
     starting = false;
-}
-
-void ArduCAM_Mini_5MP::setJpegSize(uint8_t size)
-{
-    uint8_t reg_val;
-
-    switch (size)
-    {
-        case OV5642_320x240:
-            wrSensorRegs16_8(ov5642_320x240);
-            break;
-        case OV5642_640x480:
-            wrSensorRegs16_8(ov5642_640x480);
-            break;
-        case OV5642_1024x768:
-            wrSensorRegs16_8(ov5642_1024x768);
-            break;
-        case OV5642_1280x960:
-            wrSensorRegs16_8(ov5642_1280x960);
-            break;
-        case OV5642_1600x1200:
-            wrSensorRegs16_8(ov5642_1600x1200);
-            break;
-        case OV5642_2048x1536:
-            wrSensorRegs16_8(ov5642_2048x1536);
-            break;
-        case OV5642_2592x1944:
-            wrSensorRegs16_8(ov5642_2592x1944);
-            break;
-        default:
-            wrSensorRegs16_8(ov5642_320x240);
-            break;
-    }
 }
 
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, 0x5FFFF, cs, fg)
