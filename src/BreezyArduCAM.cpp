@@ -96,15 +96,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define VSYNC_LEVEL_MASK   		0x02    // 0 = High active , 		1 = Low active
 #endif
 
-
-#define OV5642_320x240 		0	//320x240
-#define OV5642_640x480		1	//640x480
-#define OV5642_1024x768		2	//1024x768
-#define OV5642_1280x960 	3	//1280x960
-#define OV5642_1600x1200	4	//1600x1200
-#define OV5642_2048x1536	5	//2048x1536
-#define OV5642_2592x1944	6	//2592x1944
-
 ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint32_t mfs, uint8_t cs, class ArduCAM_FrameGrabber * fg)
 {
     P_CS  = portOutputRegister(digitalPinToPort(cs));
