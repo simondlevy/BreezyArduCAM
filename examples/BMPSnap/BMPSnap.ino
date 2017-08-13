@@ -25,7 +25,8 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 // set pin 10 as the slave select for the digital pot:
 static const int CS = 10;
 
-Serial_ArduCAM_Mini_2MP myCam(CS);
+Serial_ArduCAM_FrameGrabber fg;
+ArduCAM_Mini_2MP myCam(CS, &fg);
 
 void setup(void) 
 {
