@@ -39,57 +39,6 @@ struct sensor_reg {
     uint16_t val;
 };
 
-class ArduCAM_FrameGrabber {
-
-    public:
-
-        /**
-         * Override this method in your implementing class.
-         * @return true when you're ready to begin capture, false otherwise
-         */
-        virtual bool gotStartRequest(void) = 0;
-
-        /**
-         * Override this method in your implementing class.
-         * @return true when you're ready to stop capture, false otherwise
-         */
-        virtual bool gotStopRequest(void) = 0;
-
-        /**
-         * Override this method in your implementing class.
-         * @param b byte to send to host or other consumer
-         */
-        virtual void sendByte(uint8_t b) = 0;
-};
-
-class Serial_ArduCAM_FrameGrabber : public ArduCAM_FrameGrabber {
-
-    public:
-
-        virtual bool gotStartRequest(void) override 
-        {
-            return (Serial.available() && Serial.read());
-        }
-
-        /**
-         * Implements the gotStopRequest() method by checking for a zero byte from the host computer.
-         */
-        virtual bool gotStopRequest(void) override 
-        {
-            return (Serial.available() && !Serial.read());
-        }
-
-        /**
-         * Implements the sencByte() method by sending the byte to the host computer.
-         * @param b the byte to send
-     */
-    virtual void sendByte(uint8_t b) override 
-    {
-        Serial.write(b);
-    }
-};
-
-
 /**
  * An abstract class for the ArduCAM Mini.  
  */
@@ -243,5 +192,68 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
          bool capturing;
          bool starting;
 };
+
+/**
+ * An abstract class for grabbing frames from ArducAM Mini
+ */
+class ArduCAM_FrameGrabber {
+
+    friend class ArduCAM_Mini_2MP;
+
+    protected:
+
+        /**
+         * Override this method in your implementing class.
+         * @return true when you're ready to begin capture, false otherwise
+         */
+        virtual bool gotStartRequest(void) = 0;
+
+        /**
+         * Override this method in your implementing class.
+         * @return true when you're ready to stop capture, false otherwise
+         */
+        virtual bool gotStopRequest(void) = 0;
+
+        /**
+         * Override this method in your implementing class.
+         * @param b byte to send to host or other consumer
+         */
+        virtual void sendByte(uint8_t b) = 0;
+};
+
+/**
+ * Uses Serial to grab frames
+ */
+class Serial_ArduCAM_FrameGrabber : public ArduCAM_FrameGrabber {
+
+    protected:
+
+        /**
+         * Implements the gotStartRequest() method by checking for a one byte from the host computer.
+         */
+        virtual bool gotStartRequest(void) override 
+        {
+            return (Serial.available() && Serial.read());
+        }
+
+        /**
+         * Implements the gotStopRequest() method by checking for a zero byte from the host computer.
+         */
+        virtual bool gotStopRequest(void) override 
+        {
+            return (Serial.available() && !Serial.read());
+        }
+
+        /**
+         * Implements the sencByte() method by sending the byte to the host computer.
+         * @param b the byte to send
+     */
+    virtual void sendByte(uint8_t b) override 
+    {
+        Serial.write(b);
+    }
+};
+
+
 
 #endif

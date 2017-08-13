@@ -22,11 +22,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <BreezyArduCAM.h>
 #include <Wire.h>
 
-class Timed_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
-
-    public:
-
-        Timed_ArduCAM_Mini_2MP(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
+class Timed_ArduCAM_FrameGrabber : public ArduCAM_FrameGrabber {
 
     protected:
 
@@ -49,7 +45,9 @@ class Timed_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
 
 static const int CS = 10;
 
-Timed_ArduCAM_Mini_2MP myCam(CS);
+
+Timed_ArduCAM_FrameGrabber fg;
+ArduCAM_Mini_2MP myCam(CS, &fg);
 
 static uint32_t count;
 static uint32_t start;
