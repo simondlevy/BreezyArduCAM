@@ -55,7 +55,7 @@ class ArduCAM_Mini {
 
     protected:
 
-        ArduCAM_Mini(uint8_t sensor_addr, uint8_t cs, class ArduCAM_FrameGrabber * fg);
+        ArduCAM_Mini(uint8_t sensor_addr, uint32_t mfs, uint8_t cs, class ArduCAM_FrameGrabber * fg);
 
         void spiCheck(void);
 
@@ -89,9 +89,13 @@ class ArduCAM_Mini {
 
         byte wrSensorReg16_8(int regID, int regDat);
 
+        void read_fifo_burst(bool is_header);
+
         regtype *P_CS;
         regsize B_CS;
         byte sensor_addr;
+
+        uint32_t max_fifo_size;
 
         uint8_t scaledown;
         bool grayscale;
@@ -117,8 +121,6 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
         void beginJpeg(void);
 
         void setJpegSize(uint8_t size);
-
-        void read_fifo_burst(bool is_header);
 
     private:
 

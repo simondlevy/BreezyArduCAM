@@ -87,9 +87,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define FIFO_SIZE2				0x43    //Camera write FIFO size[15:8]
 #define FIFO_SIZE3				0x44    //Camera write FIFO size[18:16]
 
-//Define maximum frame buffer size
-#define MAX_FIFO_SIZE		    0x5FFFF //384KByte
-
 #define BMP 	0
 #define JPEG	1
 
@@ -109,15 +106,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 /* Terminating list entry for val */
 #define SENSOR_VAL_TERM_8BIT                0xFF
 #define SENSOR_VAL_TERM_16BIT               0xFFFF
-
-//Define maximum frame buffer size
-#if (defined OV2640_MINI_2MP)
-#define MAX_FIFO_SIZE		0x5FFFF			//384KByte
-#elif (defined OV5642_MINI_5MP || defined OV5642_MINI_5MP_BIT_ROTATION_FIXED || defined ARDUCAM_SHIELD_REVC)
-#define MAX_FIFO_SIZE		0x7FFFF			//512KByte
-#else
-#define MAX_FIFO_SIZE		0x7FFFFF		//8MByte
-#endif 
 
 /****************************************************/
 /* ArduChip registers definition 											*/
@@ -159,14 +147,16 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
 
 
-ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs, class ArduCAM_FrameGrabber * fg)
+ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint32_t mfs, uint8_t cs, class ArduCAM_FrameGrabber * fg)
 {
     P_CS  = portOutputRegister(digitalPinToPort(cs));
     B_CS  = digitalPinToBitMask(cs);
 
     pinMode(cs, OUTPUT);
     sbi(P_CS, B_CS);
+
     sensor_addr = addr;
+    max_fifo_size = mfs;
 
     grabber = fg;
 }
@@ -199,7 +189,7 @@ void ArduCAM_Mini::capture(void)
 
             uint32_t length = read_fifo_length();
 
-            if (length >= MAX_FIFO_SIZE || length == 0) {
+            if (length >= max_fifo_size || length == 0) {
                 clear_fifo_flag();
                 starting = true;
                 return;
@@ -225,7 +215,7 @@ void ArduCAM_Mini::capture(void)
 /* Public methods                                   */
 /****************************************************/
 
-ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, cs, fg) 
+ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, 0x7FFFF, cs, fg) 
 {
 }
 
@@ -313,12 +303,12 @@ void ArduCAM_Mini_5MP::setJpegSize(uint8_t size)
     }
 }
 
-void ArduCAM_Mini_5MP::read_fifo_burst(bool is_header)
+void ArduCAM_Mini::read_fifo_burst(bool is_header)
 {
     uint8_t temp = 0, temp_last = 0;
     uint32_t length = 0; 
     length = read_fifo_length();
-    if (length >= MAX_FIFO_SIZE) //512 kb
+    if (length >= max_fifo_size) 
     {
         Serial.println(F("ACK CMD Over size."));
         return 0;
@@ -350,7 +340,7 @@ void ArduCAM_Mini_5MP::read_fifo_burst(bool is_header)
     return 1;
 }
 
-ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, cs, fg)
+ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, 0x5FFFF, cs, fg)
 {
     usingJpeg = false;
 }
