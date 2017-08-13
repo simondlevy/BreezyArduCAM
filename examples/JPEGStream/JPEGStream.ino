@@ -24,7 +24,8 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 static const int CS = 10;
 
-ArduCAM_Mini_2MP myCam(CS);
+Serial_ArduCAM_FrameGrabber fg;
+ArduCAM_Mini_2MP myCam(CS, &fg);
 
 void setup(void) 
 {

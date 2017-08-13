@@ -159,7 +159,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
 
 
-ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs)
+ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs, class ArduCAM_FrameGrabber * fg)
 {
     P_CS  = portOutputRegister(digitalPinToPort(cs));
     B_CS  = digitalPinToBitMask(cs);
@@ -167,6 +167,8 @@ ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs)
     pinMode(cs, OUTPUT);
     sbi(P_CS, B_CS);
     sensor_addr = addr;
+
+    grabber = fg;
 }
 
 
@@ -174,7 +176,7 @@ ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs)
 /* Public methods                                   */
 /****************************************************/
 
-ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs) : ArduCAM_Mini(0x78, cs) 
+ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, cs, fg) 
 {
 }
 
@@ -298,7 +300,7 @@ void ArduCAM_Mini_5MP::read_fifo_burst(bool is_header)
     return 1;
 }
 
-ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs) : ArduCAM_Mini(0x60, cs)
+ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, cs, fg)
 {
     usingJpeg = false;
 }
@@ -360,7 +362,7 @@ void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
 void ArduCAM_Mini_2MP::capture(void)
 {
     // Wait for start bit from host
-    if (fg.gotStartRequest()) {
+    if (grabber->gotStartRequest()) {
         capturing = true;
         starting = true;
     }
@@ -368,7 +370,7 @@ void ArduCAM_Mini_2MP::capture(void)
     if (capturing) {
 
         // Check for halt bit from host
-        if (fg.gotStopRequest()) {
+        if (grabber->gotStopRequest()) {
             starting = false;
             capturing = false;
             return;
@@ -419,12 +421,12 @@ void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
         temp_last = temp;
         temp =  SPI.transfer(0x00);
         if (is_header) {
-            fg.sendByte(temp);
+            grabber->sendByte(temp);
         }
         else if ((temp == 0xD8) & (temp_last == 0xFF)) {
             is_header = true;
-            fg.sendByte(temp_last);
-            fg.sendByte(temp);
+            grabber->sendByte(temp_last);
+            grabber->sendByte(temp);
         }
         if ((temp == 0xD9) && (temp_last == 0xFF)) 
             break;
@@ -451,11 +453,11 @@ void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
                     uint16_t g = (rgb & 0x07E0) >> 5;
                     uint16_t b = rgb & 0x001F;
                     uint8_t gray = (uint8_t)(0.21*r + 0.72*g + 0.07*b);
-                    fg.sendByte(gray*2);
+                    grabber->sendByte(gray*2);
                 }
                 else {
-                    fg.sendByte(lo);
-                    fg.sendByte(hi);
+                    grabber->sendByte(lo);
+                    grabber->sendByte(hi);
                 }
                 delayMicroseconds(12);
             }

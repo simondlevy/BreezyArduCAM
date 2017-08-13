@@ -97,7 +97,7 @@ class ArduCAM_Mini {
 
     protected:
 
-        ArduCAM_Mini(uint8_t sensor_addr, uint8_t cs);
+        ArduCAM_Mini(uint8_t sensor_addr, uint8_t cs, class ArduCAM_FrameGrabber * fg);
 
         void spiCheck(void);
 
@@ -135,14 +135,14 @@ class ArduCAM_Mini {
         regsize B_CS;
         byte sensor_addr;
 
-         Serial_ArduCAM_FrameGrabber fg;
+        ArduCAM_FrameGrabber * grabber;
  };
 
 class ArduCAM_Mini_5MP : public ArduCAM_Mini
 {
     public:
 
-        ArduCAM_Mini_5MP(uint8_t cs);
+        ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg);
 
         void beginJpeg(void);
 
@@ -167,7 +167,7 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
          * Constructs an ArduCAM_Mini_2MP object.
          * @param cs pin for Chip Select signal
          */
-        ArduCAM_Mini_2MP(int cs);
+        ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg);
 
         /**
          * Begins capture in QVGA (raw) mode.
