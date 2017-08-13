@@ -23,250 +23,27 @@
 
 #include <BreezyArduCAM.h>
 
-#include "ov5642_regs.h"
 
 const int CS = 10;
-int mode = 0;
-uint8_t start_capture = 0;
 
 ArduCAM_Mini_5MP myCam(CS);
 
-void setup() {
+void setup(void) 
+{
 
-    uint8_t vid, pid;
-    uint8_t temp;
-
+    // ArduCAM Mini uses both I^2C and SPI buses
     Wire.begin();
-    Serial.begin(115200);
-
     SPI.begin();
 
-    while(1){
-        //Check if the ArduCAM SPI bus is OK
-        myCam.write_reg(ARDUCHIP_TEST1, 0x55);
-        temp = myCam.read_reg(ARDUCHIP_TEST1);
-        if(temp != 0x55)
-        {
-            Serial.println(F("ACK CMD SPI interface Error!"));
-            delay(1000);continue;
-        }else{
-            Serial.println(F("ACK CMD SPI interface OK."));break;
-        }
-    }
+    // Talk to Arduino at fastest possible baud rate
+    Serial.begin(115200);
 
-    //Change to JPEG capture mode and initialize the OV5642 module
-    myCam.set_format(JPEG);
-    myCam.begin();
-    myCam.set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
-    myCam.clear_fifo_flag();
-    myCam.write_reg(ARDUCHIP_FRAMES, 0x00);
+    // Start the camera in JPEG mode with a specific image size
+    myCam.beginJpeg();
 }
 
-void loop() {
+void loop(void) 
+{
 
-    uint8_t temp= 0xff, temp_last =0;
-
-    bool is_header = false;
-
-    if (Serial.available())
-    {
-        temp = Serial.read();
-        switch (temp)
-        {
-            case 0:
-                myCam.setJpegSize(OV5642_320x240);delay(1000);
-                Serial.println(F("ACK CMD switch to OV5642_320x240"));
-                temp=0xff;
-                break;
-            case 1:
-                myCam.setJpegSize(OV5642_640x480);delay(1000);
-                Serial.println(F("ACK CMD switch to OV5642_640x480"));
-                temp=0xff;
-                break;
-            case 2:
-                myCam.setJpegSize(OV5642_1024x768);delay(1000);
-                Serial.println(F("ACK CMD switch to OV5642_1024x768"));
-                temp=0xff;
-                break;
-            case 3:
-                myCam.setJpegSize(OV5642_1280x960);delay(1000);
-                Serial.println(F("ACK CMD switch to OV5642_1280x960"));
-                temp=0xff;
-                break;
-            case 4:
-                myCam.setJpegSize(OV5642_1600x1200);delay(1000);
-                Serial.println(F("ACK CMD switch to OV5642_1600x1200"));
-                temp=0xff;
-                break;
-            case 5:
-                myCam.setJpegSize(OV5642_2048x1536);delay(1000);
-                Serial.println(F("ACK CMD switch to OV5642_2048x1536"));
-                temp=0xff;
-                break;
-            case 6:
-                myCam.setJpegSize(OV5642_2592x1944);delay(1000);
-                Serial.println(F("ACK CMD switch to OV5642_2592x1944"));
-                temp=0xff;
-                break;
-            case 0x10:
-                mode = 1;
-                start_capture = 1;
-                Serial.println(F("ACK CMD CAM start single shoot."));
-                break;
-            case 0x11:
-                myCam.set_format(JPEG);
-                myCam.begin();
-                myCam.set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
-                break;
-            case 0x20:
-                mode = 2;
-                start_capture = 2;
-                Serial.println(F("ACK CMD CAM start video streaming."));
-                break;
-            case 0x30:
-                mode = 3;
-                temp = 0xff;
-                start_capture = 3;
-                Serial.println(F("CAM start single shoot."));
-                break;
-            case 0x31:
-                temp = 0xff;
-                myCam.set_format(BMP);
-                myCam.begin();      
-                myCam.clear_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
-                myCam.wrSensorReg16_8(0x3818, 0x81);
-                myCam.wrSensorReg16_8(0x3621, 0xA7);
-                break;
-            default:
-                break;
-        }
-    }
-
-    if (mode == 1)
-    {
-        if (start_capture == 1)
-        {
-            myCam.flush_fifo();
-            myCam.clear_fifo_flag();
-            //Start capture
-            myCam.start_capture();
-            start_capture = 0;
-        }
-        if (myCam.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
-        {
-            Serial.println(F("CAM Capture Done."));
-            myCam.read_fifo_burst(is_header);
-            is_header = false;
-            //Clear the capture done flag
-            myCam.clear_fifo_flag();
-        }
-    }
-    else if (mode == 2)
-    {
-        while (1)
-        {
-            temp = Serial.read();
-            if (temp == 0x21)
-            {
-                start_capture = 0;
-                mode = 0;
-                Serial.println(F("ACK CMD CAM stop video streaming."));
-                break;
-            }
-            if (start_capture == 2)
-            {
-                myCam.flush_fifo();
-                myCam.clear_fifo_flag();
-                //Start capture
-                myCam.start_capture();
-                start_capture = 0;
-            }
-            if (myCam.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
-            {
-                uint32_t length = 0;
-                length = myCam.read_fifo_length();
-                if ((length >= MAX_FIFO_SIZE) | (length == 0))
-                {
-                    myCam.clear_fifo_flag();
-                    start_capture = 2;
-                    continue;
-                }
-                myCam.csLow();
-                myCam.set_fifo_burst();//Set fifo burst mode
-                while ( length-- )
-                {
-                    temp_last = temp;
-                    temp =  SPI.transfer(0x00);
-                    if (is_header == true)
-                    {
-                    }
-                    else if ((temp == 0xD8) & (temp_last == 0xFF))
-                    {
-                        is_header = true;
-                        Serial.println(F("ACK IMG"));
-                    }
-                    if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
-                        break;
-                    delayMicroseconds(15);
-                }
-                myCam.csHigh();
-                myCam.clear_fifo_flag();
-                start_capture = 2;
-                is_header = false;
-            }
-        }
-    }
-    else if (mode == 3)
-    {
-        if (start_capture == 3)
-        {
-            //Flush the FIFO
-            myCam.flush_fifo();
-            myCam.clear_fifo_flag();
-            //Start capture
-            myCam.start_capture();
-            start_capture = 0;
-        }
-        if (myCam.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
-        {
-            Serial.println(F("ACK CMD CAM Capture Done."));
-            uint8_t temp, temp_last;
-            uint32_t length = 0;
-            length = myCam.read_fifo_length();
-            if (length >= MAX_FIFO_SIZE ) 
-            {
-                Serial.println(F("ACK CMD Over size."));
-                myCam.clear_fifo_flag();
-                return;
-            }
-            if (length == 0 ) //0 kb
-            {
-                Serial.println(F("ACK CMD Size is 0."));
-                myCam.clear_fifo_flag();
-                return;
-            }
-            myCam.csLow();
-            myCam.set_fifo_burst();//Set fifo burst mode
-            char VH, VL;
-            int i = 0, j = 0;
-            for (i = 0; i < 240; i++)
-            {
-                for (j = 0; j < 320; j++)
-                {
-                    VH = SPI.transfer(0x00);;
-                    VL = SPI.transfer(0x00);;
-                    //Serial.write(VL);
-                    delayMicroseconds(12);
-                    //Serial.write(VH);
-                    delayMicroseconds(12);
-                }
-            }
-            //Serial.write(0xBB);
-            //Serial.write(0xCC);
-            myCam.csHigh();
-            //Clear the capture done flag
-            myCam.clear_fifo_flag();
-        }
-    }
 }
 

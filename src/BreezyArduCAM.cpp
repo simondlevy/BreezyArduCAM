@@ -90,6 +90,75 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 //Define maximum frame buffer size
 #define MAX_FIFO_SIZE		    0x5FFFF //384KByte
 
+#define BMP 	0
+#define JPEG	1
+
+#define OV5642_320x240 		0	//320x240
+#define OV5642_640x480		1	//640x480
+#define OV5642_1024x768		2	//1024x768
+#define OV5642_1280x960 	3	//1280x960
+#define OV5642_1600x1200	4	//1600x1200
+#define OV5642_2048x1536	5	//2048x1536
+#define OV5642_2592x1944	6	//2592x1944
+
+
+/* Register initialization tables for SENSORs */
+/* Terminating list entry for reg */
+#define SENSOR_REG_TERM_8BIT                0xFF
+#define SENSOR_REG_TERM_16BIT               0xFFFF
+/* Terminating list entry for val */
+#define SENSOR_VAL_TERM_8BIT                0xFF
+#define SENSOR_VAL_TERM_16BIT               0xFFFF
+
+//Define maximum frame buffer size
+#if (defined OV2640_MINI_2MP)
+#define MAX_FIFO_SIZE		0x5FFFF			//384KByte
+#elif (defined OV5642_MINI_5MP || defined OV5642_MINI_5MP_BIT_ROTATION_FIXED || defined ARDUCAM_SHIELD_REVC)
+#define MAX_FIFO_SIZE		0x7FFFF			//512KByte
+#else
+#define MAX_FIFO_SIZE		0x7FFFFF		//8MByte
+#endif 
+
+/****************************************************/
+/* ArduChip registers definition 											*/
+/****************************************************/
+#define ARDUCHIP_TEST1       	0x00  //TEST register
+
+#define ARDUCHIP_FRAMES			  0x01  //FRAME control register, Bit[2:0] = Number of frames to be captured																		//On 5MP_Plus platforms bit[2:0] = 7 means continuous capture until frame buffer is full
+
+#define ARDUCHIP_MODE      		0x02  //Mode register
+#define MCU2LCD_MODE       		0x00
+#define CAM2LCD_MODE       		0x01
+#define LCD2MCU_MODE       		0x02
+
+#define ARDUCHIP_TIM       		0x03  //Timming control
+
+#if !(defined OV2640_MINI_2MP)
+#define HREF_LEVEL_MASK    		0x01  //0 = High active , 		1 = Low active
+#define VSYNC_LEVEL_MASK   		0x02  //0 = High active , 		1 = Low active
+#define LCD_BKEN_MASK      		0x04  //0 = Enable, 					1 = Disable
+#define PCLK_DELAY_MASK  		0x08  //0 = data no delay,		1 = data delayed one PCLK
+#endif
+
+#define ARDUCHIP_FIFO      		0x04  //FIFO and I2C control
+#define FIFO_CLEAR_MASK    		0x01
+#define FIFO_START_MASK    		0x02
+#define FIFO_RDPTR_RST_MASK     0x10
+#define FIFO_WRPTR_RST_MASK     0x20
+
+#define BURST_FIFO_READ			0x3C  //Burst FIFO read operation
+#define SINGLE_FIFO_READ		0x3D  //Single FIFO read operation
+
+#define ARDUCHIP_TRIG      		0x41  //Trigger source
+#define VSYNC_MASK         		0x01
+#define SHUTTER_MASK       		0x02
+#define CAP_DONE_MASK      		0x08
+
+#define FIFO_SIZE1				0x42  //Camera write FIFO size[7:0] for burst to read
+#define FIFO_SIZE2				0x43  //Camera write FIFO size[15:8]
+#define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
+
+
 ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs)
 {
     P_CS  = portOutputRegister(digitalPinToPort(cs));
@@ -109,13 +178,27 @@ ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs) : ArduCAM_Mini(0x78, cs)
 {
 }
 
-void ArduCAM_Mini_5MP::begin(void)
+void ArduCAM_Mini_5MP::beginJpeg(void)
+{    
+    // Check SPI connection
+    spiCheck();
+
+    //Change to JPEG capture mode and initialize the OV5642 module
+    begin(JPEG);
+    set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
+    clear_fifo_flag();
+    write_reg(ARDUCHIP_FRAMES, 0x00);
+}
+
+void ArduCAM_Mini_5MP::begin(uint8_t fmt)
 {
 
     wrSensorReg16_8(0x3008, 0x80);
     wrSensorRegs16_8(OV5642_QVGA_Preview);
+
     delay(100);
-    if (m_fmt == JPEG)
+
+    if (fmt == JPEG)
     {
         delay(100);
         wrSensorRegs16_8(OV5642_JPEG_Capture_QSXGA);
@@ -125,6 +208,7 @@ void ArduCAM_Mini_5MP::begin(void)
         wrSensorReg16_8(0x3801, 0xb0);
         wrSensorReg16_8(0x4407, 0x04);
     }
+
     else
     {
         byte reg_val;
@@ -212,14 +296,6 @@ void ArduCAM_Mini_5MP::read_fifo_burst(bool is_header)
     }
     csHigh();
     return 1;
-}
-
-void ArduCAM_Mini_5MP::set_format(byte fmt)
-{
-      if (fmt == BMP)
-              m_fmt = BMP;
-        else
-                m_fmt = JPEG;
 }
 
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs) : ArduCAM_Mini(0x60, cs)
@@ -404,6 +480,21 @@ void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
 
 void ArduCAM_Mini_2MP::begin(void)
 {
+    spiCheck();
+
+    wrSensorReg8_8(0xff, 0x01);
+    wrSensorReg8_8(0x12, 0x80);
+
+    capturing = false;
+    starting = false;
+
+    delay(100);
+}
+
+// ------------------------------------------------------------------------------------------
+
+void ArduCAM_Mini::spiCheck(void)
+{
     // Check if the ArduCAM SPI bus is OK
     while (true) {
         write_reg(ARDUCHIP_TEST1, 0x55);
@@ -417,17 +508,7 @@ void ArduCAM_Mini_2MP::begin(void)
             break;
         }
     }
-
-    wrSensorReg8_8(0xff, 0x01);
-    wrSensorReg8_8(0x12, 0x80);
-
-    capturing = false;
-    starting = false;
-
-    delay(100);
 }
-
-// ------------------------------------------------------------------------------------------
 
 void ArduCAM_Mini::flush_fifo(void)
 {
