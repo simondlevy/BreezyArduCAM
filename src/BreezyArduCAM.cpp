@@ -318,7 +318,6 @@ void ArduCAM_Mini_5MP::read_fifo_burst(bool is_header)
     uint8_t temp = 0, temp_last = 0;
     uint32_t length = 0; 
     length = read_fifo_length();
-    Serial.println(length, DEC);
     if (length >= MAX_FIFO_SIZE) //512 kb
     {
         Serial.println(F("ACK CMD Over size."));
@@ -342,9 +341,6 @@ void ArduCAM_Mini_5MP::read_fifo_burst(bool is_header)
         else if ((temp == 0xD8) & (temp_last == 0xFF))
         {
             is_header = true;
-            Serial.println(F("ACK IMG"));
-            //Serial.write(temp_last);
-            //Serial.write(temp);
         }
         if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
             break;

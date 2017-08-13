@@ -26,4 +26,5 @@ def sendbyte(port, value):
     port.write(bytearray([value]))
 
 def ackcheck(port, msg):
-    assert(msg in port.readline().decode())
+    line = port.readline().decode()
+    assert(msg in line)
