@@ -122,7 +122,7 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
 
     private:
 
-        void begin(uint8_t fmt);
+        void begin(void);
 };
 
 

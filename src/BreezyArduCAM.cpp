@@ -87,9 +87,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define FIFO_SIZE2				0x43    //Camera write FIFO size[15:8]
 #define FIFO_SIZE3				0x44    //Camera write FIFO size[18:16]
 
-#define BMP 	0
-#define JPEG	1
-
 #define OV5642_320x240 		0	//320x240
 #define OV5642_640x480		1	//640x480
 #define OV5642_1024x768		2	//1024x768
@@ -221,19 +218,19 @@ ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg) 
 
 void ArduCAM_Mini_5MP::beginJpeg(void)
 {    
+    usingJpeg = true;
+
     // Check SPI connection
     spiCheck();
 
-    //Change to JPEG capture mode and initialize the OV5642 module
-    begin(JPEG);
+    begin();
+
     set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
     clear_fifo_flag();
     write_reg(ARDUCHIP_FRAMES, 0x00);
-
-    usingJpeg = true;
 }
 
-void ArduCAM_Mini_5MP::begin(uint8_t fmt)
+void ArduCAM_Mini_5MP::begin(void)
 {
 
     wrSensorReg16_8(0x3008, 0x80);
@@ -241,7 +238,7 @@ void ArduCAM_Mini_5MP::begin(uint8_t fmt)
 
     delay(100);
 
-    if (fmt == JPEG)
+    if (usingJpeg)
     {
         delay(100);
         wrSensorRegs16_8(OV5642_JPEG_Capture_QSXGA);
