@@ -360,7 +360,7 @@ void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
 void ArduCAM_Mini_2MP::capture(void)
 {
     // Wait for start bit from host
-    if (gotStartRequest()) {
+    if (fg.gotStartRequest()) {
         capturing = true;
         starting = true;
     }
@@ -368,7 +368,7 @@ void ArduCAM_Mini_2MP::capture(void)
     if (capturing) {
 
         // Check for halt bit from host
-        if (gotStopRequest()) {
+        if (fg.gotStopRequest()) {
             starting = false;
             capturing = false;
             return;
@@ -419,12 +419,12 @@ void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
         temp_last = temp;
         temp =  SPI.transfer(0x00);
         if (is_header) {
-            sendByte(temp);
+            fg.sendByte(temp);
         }
         else if ((temp == 0xD8) & (temp_last == 0xFF)) {
             is_header = true;
-            sendByte(temp_last);
-            sendByte(temp);
+            fg.sendByte(temp_last);
+            fg.sendByte(temp);
         }
         if ((temp == 0xD9) && (temp_last == 0xFF)) 
             break;
@@ -451,11 +451,11 @@ void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
                     uint16_t g = (rgb & 0x07E0) >> 5;
                     uint16_t b = rgb & 0x001F;
                     uint8_t gray = (uint8_t)(0.21*r + 0.72*g + 0.07*b);
-                    sendByte(gray*2);
+                    fg.sendByte(gray*2);
                 }
                 else {
-                    sendByte(lo);
-                    sendByte(hi);
+                    fg.sendByte(lo);
+                    fg.sendByte(hi);
                 }
                 delayMicroseconds(12);
             }

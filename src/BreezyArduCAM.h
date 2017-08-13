@@ -39,6 +39,57 @@ struct sensor_reg {
     uint16_t val;
 };
 
+class ArduCAM_FrameGrabber {
+
+    public:
+
+        /**
+         * Override this method in your implementing class.
+         * @return true when you're ready to begin capture, false otherwise
+         */
+        virtual bool gotStartRequest(void) = 0;
+
+        /**
+         * Override this method in your implementing class.
+         * @return true when you're ready to stop capture, false otherwise
+         */
+        virtual bool gotStopRequest(void) = 0;
+
+        /**
+         * Override this method in your implementing class.
+         * @param b byte to send to host or other consumer
+         */
+        virtual void sendByte(uint8_t b) = 0;
+};
+
+class Serial_ArduCAM_FrameGrabber : public ArduCAM_FrameGrabber {
+
+    public:
+
+        virtual bool gotStartRequest(void) override 
+        {
+            return (Serial.available() && Serial.read());
+        }
+
+        /**
+         * Implements the gotStopRequest() method by checking for a zero byte from the host computer.
+         */
+        virtual bool gotStopRequest(void) override 
+        {
+            return (Serial.available() && !Serial.read());
+        }
+
+        /**
+         * Implements the sencByte() method by sending the byte to the host computer.
+         * @param b the byte to send
+     */
+    virtual void sendByte(uint8_t b) override 
+    {
+        Serial.write(b);
+    }
+};
+
+
 /**
  * An abstract class for the ArduCAM Mini.  
  */
@@ -83,6 +134,8 @@ class ArduCAM_Mini {
         regtype *P_CS;
         regsize B_CS;
         byte sensor_addr;
+
+         Serial_ArduCAM_FrameGrabber fg;
  };
 
 class ArduCAM_Mini_5MP : public ArduCAM_Mini
@@ -107,8 +160,6 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
  * An abstract class for the ArduCAM Mini 2MP.  
  */
 class ArduCAM_Mini_2MP : public ArduCAM_Mini {
-
-    friend class FrameGrabber;
 
     public:
 
@@ -176,82 +227,21 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
          */
         void capture(void);
 
-    protected:
-
-        /**
-         * Override this method in your implementing class.
-         * @return true when you're ready to begin capture, false otherwise
-         */
-        virtual bool gotStartRequest(void) = 0;
-
-        /**
-         * Override this method in your implementing class.
-         * @return true when you're ready to stop capture, false otherwise
-         */
-        virtual bool gotStopRequest(void) = 0;
-
-        /**
-         * Override this method in your implementing class.
-         * @param b byte to send to host or other consumer
-         */
-         virtual void sendByte(uint8_t b) = 0;
-
     private:
 
-        void grabJpegFrame(uint32_t length);
-        void grabQvgaFrame(uint32_t length);
+         void grabJpegFrame(uint32_t length);
+         void grabQvgaFrame(uint32_t length);
 
-        void begin(void);
+         void begin(void);
 
-        void beginJpeg(const struct sensor_reg reglist[]);
+         void beginJpeg(const struct sensor_reg reglist[]);
 
 
-        uint8_t scaledown;
-        bool grayscale;
-        bool usingJpeg;
-        bool capturing;
-        bool starting;
-};
-
-/**
- * A class for communicating with the ArduCAM Mini 2MP over a serial connection.  
- */
-class Serial_ArduCAM_Mini_2MP : public ArduCAM_Mini_2MP {
-
-    public:
-
-        /**
-         * Constructs a Serial_ArduCAM_Mini_2MP object.
-         * @param cs pin for Chip Select signal
-         */
-        Serial_ArduCAM_Mini_2MP(uint8_t cs) : ArduCAM_Mini_2MP(cs) { }
-
-    protected:
-
-        /**
-         * Implements the gotStartRequest() method by checking for a nonzero byte from the host computer.
-         */
-        virtual bool gotStartRequest(void) override 
-        {
-            return (Serial.available() && Serial.read());
-        }
-
-        /**
-         * Implements the gotStopRequest() method by checking for a zero byte from the host computer.
-         */
-        virtual bool gotStopRequest(void) override 
-        {
-            return (Serial.available() && !Serial.read());
-        }
-
-        /**
-         * Implements the sencByte() method by sending the byte to the host computer.
-         * @param b the byte to send
-         */
-        virtual void sendByte(uint8_t b) override 
-        {
-            Serial.write(b);
-        }
+         uint8_t scaledown;
+         bool grayscale;
+         bool usingJpeg;
+         bool capturing;
+         bool starting;
 };
 
 #endif
