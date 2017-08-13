@@ -39,8 +39,6 @@ void setup() {
     Wire.begin();
     Serial.begin(115200);
 
-    pinMode(CS, OUTPUT);
-
     SPI.begin();
 
     while(1){
@@ -53,18 +51,6 @@ void setup() {
             delay(1000);continue;
         }else{
             Serial.println(F("ACK CMD SPI interface OK."));break;
-        }
-    }
-
-    while(1){
-        //Check if the camera module type is OV5642
-        myCam.rdSensorReg16_8(OV5642_CHIPID_HIGH, &vid);
-        myCam.rdSensorReg16_8(OV5642_CHIPID_LOW, &pid);
-        if ((vid != 0x56) || (pid != 0x42)){
-            Serial.println(F("ACK CMD Can't find OV5642 module!"));
-            delay(1000);continue;
-        }else{
-            Serial.println(F("ACK CMD OV5642 detected."));break;      
         }
     }
 
