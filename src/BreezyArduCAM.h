@@ -44,48 +44,69 @@ struct sensor_reg {
  */
 class ArduCAM_Mini {
 
+    public:
+
+    /**
+     * Runs in Arduino loop() function to capture bytes.
+     * Calls gotStartRequest(), gotStopRequest(), and sendByte() methods
+     * of implementing class.
+     */
+    void capture(void);
+
     protected:
 
-        ArduCAM_Mini(uint8_t sensor_addr, uint8_t cs, class ArduCAM_FrameGrabber * fg);
+    ArduCAM_Mini(uint8_t sensor_addr, uint8_t cs, class ArduCAM_FrameGrabber * fg);
 
-        void spiCheck(void);
+    void spiCheck(void);
 
-        void csHigh(void);
-        void csLow(void);
+    void csHigh(void);
+    void csLow(void);
 
-        void flush_fifo(void);
-        void start_capture(void);
-        void clear_fifo_flag(void);
-        uint8_t read_fifo(void);
+    void flush_fifo(void);
+    void start_capture(void);
+    void clear_fifo_flag(void);
+    uint8_t read_fifo(void);
 
-        uint8_t read_reg(uint8_t addr);
-        void write_reg(uint8_t addr, uint8_t data);	
+    uint8_t read_reg(uint8_t addr);
+    void write_reg(uint8_t addr, uint8_t data);	
 
-        uint32_t read_fifo_length(void);
-        void set_fifo_burst(void);
+    uint32_t read_fifo_length(void);
+    void set_fifo_burst(void);
 
-        void set_bit(uint8_t addr, uint8_t bit);
-        void clear_bit(uint8_t addr, uint8_t bit);
-        uint8_t get_bit(uint8_t addr, uint8_t bit);
+    void set_bit(uint8_t addr, uint8_t bit);
+    void clear_bit(uint8_t addr, uint8_t bit);
+    uint8_t get_bit(uint8_t addr, uint8_t bit);
 
-        uint8_t bus_write(int address, int value);
-        uint8_t bus_read(int address);	
+    uint8_t bus_write(int address, int value);
+    uint8_t bus_read(int address);	
 
-        int wrSensorRegs8_8(const struct sensor_reg*);
-        byte wrSensorReg8_8(int regID, int regDat);
-        byte rdSensorReg8_8(uint8_t regID, uint8_t* regDat);
-        byte rdSensorReg16_8(uint16_t regID, uint8_t* regDat);
+    int wrSensorRegs8_8(const struct sensor_reg*);
+    byte wrSensorReg8_8(int regID, int regDat);
+    byte rdSensorReg8_8(uint8_t regID, uint8_t* regDat);
+    byte rdSensorReg16_8(uint16_t regID, uint8_t* regDat);
 
-        int wrSensorRegs16_8(const struct sensor_reg*);
+    int wrSensorRegs16_8(const struct sensor_reg*);
 
-        byte wrSensorReg16_8(int regID, int regDat);
+    byte wrSensorReg16_8(int regID, int regDat);
 
-        regtype *P_CS;
-        regsize B_CS;
-        byte sensor_addr;
+    regtype *P_CS;
+    regsize B_CS;
+    byte sensor_addr;
 
-        ArduCAM_FrameGrabber * grabber;
- };
+    uint8_t scaledown;
+    bool grayscale;
+    bool usingJpeg;
+    bool capturing;
+    bool starting;
+
+    private:
+
+    ArduCAM_FrameGrabber * grabber;
+
+    void grabJpegFrame(uint32_t length);
+    void grabQvgaFrame(uint32_t length);
+
+};
 
 class ArduCAM_Mini_5MP : public ArduCAM_Mini
 {
@@ -169,28 +190,12 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
          */
         void beginJpeg1600x1200(void);
 
-        /**
-         * Runs in Arduino loop() function to capture bytes.
-         * Calls gotStartRequest(), gotStopRequest(), and sendByte() methods
-         * of implementing class.
-         */
-        void capture(void);
-
     private:
-
-         void grabJpegFrame(uint32_t length);
-         void grabQvgaFrame(uint32_t length);
 
          void begin(void);
 
          void beginJpeg(const struct sensor_reg reglist[]);
 
-
-         uint8_t scaledown;
-         bool grayscale;
-         bool usingJpeg;
-         bool capturing;
-         bool starting;
 };
 
 /**
@@ -198,7 +203,7 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
  */
 class ArduCAM_FrameGrabber {
 
-    friend class ArduCAM_Mini_2MP;
+    friend class ArduCAM_Mini;
 
     protected:
 

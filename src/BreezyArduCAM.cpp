@@ -171,6 +171,55 @@ ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint8_t cs, class ArduCAM_FrameGrabber 
     grabber = fg;
 }
 
+void ArduCAM_Mini::capture(void)
+{
+    // Wait for start bit from host
+    if (grabber->gotStartRequest()) {
+        capturing = true;
+        starting = true;
+    }
+
+    if (capturing) {
+
+        // Check for halt bit from host
+        if (grabber->gotStopRequest()) {
+            starting = false;
+            capturing = false;
+            return;
+        }
+
+        if (starting) {
+            flush_fifo();
+            clear_fifo_flag();
+            start_capture();
+            starting = false;
+        }
+
+        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+
+            uint32_t length = read_fifo_length();
+
+            if (length >= MAX_FIFO_SIZE || length == 0) {
+                clear_fifo_flag();
+                starting = true;
+                return;
+            }
+
+            csLow();
+            set_fifo_burst();
+            SPI.transfer(0x00);
+
+            if (usingJpeg)
+                grabJpegFrame(length);
+            else
+                grabQvgaFrame(length);
+
+            csHigh();
+            clear_fifo_flag();
+        }
+    }
+}
+
 
 /****************************************************/
 /* Public methods                                   */
@@ -190,6 +239,8 @@ void ArduCAM_Mini_5MP::beginJpeg(void)
     set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
     clear_fifo_flag();
     write_reg(ARDUCHIP_FRAMES, 0x00);
+
+    usingJpeg = true;
 }
 
 void ArduCAM_Mini_5MP::begin(uint8_t fmt)
@@ -224,6 +275,9 @@ void ArduCAM_Mini_5MP::begin(uint8_t fmt)
         rdSensorReg16_8(0x3621, &reg_val);
         wrSensorReg16_8(0x3621, reg_val & 0xdf);
     }
+
+    capturing = false;
+    starting = false;
 }
 
 void ArduCAM_Mini_5MP::setJpegSize(uint8_t size)
@@ -359,60 +413,11 @@ void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
     beginJpeg(OV2640_1600x1200_JPEG);
 }
 
-void ArduCAM_Mini_2MP::capture(void)
-{
-    // Wait for start bit from host
-    if (grabber->gotStartRequest()) {
-        capturing = true;
-        starting = true;
-    }
-
-    if (capturing) {
-
-        // Check for halt bit from host
-        if (grabber->gotStopRequest()) {
-            starting = false;
-            capturing = false;
-            return;
-        }
-
-        if (starting) {
-            flush_fifo();
-            clear_fifo_flag();
-            start_capture();
-            starting = false;
-        }
-
-        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
-
-            uint32_t length = read_fifo_length();
-
-            if (length >= MAX_FIFO_SIZE || length == 0) {
-                clear_fifo_flag();
-                starting = true;
-                return;
-            }
-
-            csLow();
-            set_fifo_burst();
-            SPI.transfer(0x00);
-
-            if (usingJpeg)
-                grabJpegFrame(length);
-            else
-                grabQvgaFrame(length);
-
-            csHigh();
-            clear_fifo_flag();
-        }
-    }
-}
-
 /****************************************************/
 /* Private methods                                  */
 /****************************************************/
 
-void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
+void ArduCAM_Mini::grabJpegFrame(uint32_t length)
 {
     uint8_t temp = 0xff, temp_last = 0;
     bool is_header = false;
@@ -437,7 +442,7 @@ void ArduCAM_Mini_2MP::grabJpegFrame(uint32_t length)
     starting = true;
 }
 
-void ArduCAM_Mini_2MP::grabQvgaFrame(uint32_t length)
+void ArduCAM_Mini::grabQvgaFrame(uint32_t length)
 {
     // ignore length and use fixed-size frame
     (void)length;
