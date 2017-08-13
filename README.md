@@ -7,7 +7,8 @@ I've taken the code in the original ArduCAM Arduino [repository](https://github.
 and simplified the API, so you can write new applications with a minimal amount of effort.  
 
 As you can see in this 
-<a href="https://github.com/simondlevy/BreezyArduCAM/blob/master/arduino/BreezyArduCAM/examples/JPEGStream/JPEGStream.ino#L27-L45">example</a>,
+<a href="https://github.com/simondlevy/BreezyArduCAM/blob/master/examples/JPEGStream/JPEGStream.ino#L27-L45">
+example</a>,
 you just call a constructor method, a begin method, and a capture method.
 Each example
 (streaming JPEG images, BMP snapshot) has a corresponding Python script that you can run on your host 
