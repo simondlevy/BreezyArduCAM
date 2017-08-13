@@ -441,33 +441,6 @@ const struct sensor_reg OV5642_640x480_RAW[] PROGMEM =
 {0xffff,0xff},	
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const struct sensor_reg ov5642_320x240[] PROGMEM =
 {
 	{0x3800 ,0x1 },
