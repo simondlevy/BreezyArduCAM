@@ -89,8 +89,6 @@ class ArduCAM_Mini {
 
         byte wrSensorReg16_8(int regID, int regDat);
 
-        void read_fifo_burst(bool is_header);
-
         regtype *P_CS;
         regsize B_CS;
         byte sensor_addr;
