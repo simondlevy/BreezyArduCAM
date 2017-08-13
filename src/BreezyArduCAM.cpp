@@ -109,7 +109,7 @@ ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs) : ArduCAM_Mini(0x78, cs)
 {
 }
 
-void ArduCAM_Mini_5MP::begin()
+void ArduCAM_Mini_5MP::begin(void)
 {
 
     wrSensorReg16_8(0x3008, 0x80);
@@ -171,6 +171,55 @@ void ArduCAM_Mini_5MP::setJpegSize(uint8_t size)
             wrSensorRegs16_8(ov5642_320x240);
             break;
     }
+}
+
+void ArduCAM_Mini_5MP::read_fifo_burst(bool is_header)
+{
+    uint8_t temp = 0, temp_last = 0;
+    uint32_t length = 0; 
+    length = read_fifo_length();
+    Serial.println(length, DEC);
+    if (length >= MAX_FIFO_SIZE) //512 kb
+    {
+        Serial.println(F("ACK CMD Over size."));
+        return 0;
+    }
+    if (length == 0 ) //0 kb
+    {
+        Serial.println(F("ACK CMD Size is 0."));
+        return 0;
+    }
+    csLow();
+    set_fifo_burst();//Set fifo burst mode
+    while ( length-- )
+    {
+        temp_last = temp;
+        temp =  SPI.transfer(0x00);
+        if (is_header)
+        {
+            //Serial.write(temp);
+        }
+        else if ((temp == 0xD8) & (temp_last == 0xFF))
+        {
+            is_header = true;
+            Serial.println(F("ACK IMG"));
+            //Serial.write(temp_last);
+            //Serial.write(temp);
+        }
+        if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
+            break;
+        delayMicroseconds(15);
+    }
+    csHigh();
+    return 1;
+}
+
+void ArduCAM_Mini_5MP::set_format(byte fmt)
+{
+      if (fmt == BMP)
+              m_fmt = BMP;
+        else
+                m_fmt = JPEG;
 }
 
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs) : ArduCAM_Mini(0x60, cs)
@@ -353,7 +402,7 @@ void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
     wrSensorRegs8_8(reglist);
 }
 
-void ArduCAM_Mini_2MP::begin()
+void ArduCAM_Mini_2MP::begin(void)
 {
     // Check if the ArduCAM SPI bus is OK
     while (true) {

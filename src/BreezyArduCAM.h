@@ -167,6 +167,10 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
 
         void setJpegSize(uint8_t size);
 
+        void set_format(byte fmt);
+
+        void read_fifo_burst(bool is_header);
+
     private:
 
         byte m_fmt;
@@ -271,7 +275,7 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
         void grabJpegFrame(uint32_t length);
         void grabQvgaFrame(uint32_t length);
 
-        void begin();
+        void begin(void);
 
         void beginJpeg(const struct sensor_reg reglist[]);
 
