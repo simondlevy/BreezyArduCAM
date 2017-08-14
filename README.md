@@ -14,8 +14,7 @@ Each example
 (streaming JPEG images, BMP snapshot) has a corresponding Python script that you can run on your host 
 computer.
 
-I am currently supporting only the ArduCAM Mini 2MP, but may add support for other cameras if I end
-up buying them.
+I have tested this library with ArduCAM Mini 2MP (OV2640) and ArducamMini 5MP Plus (OV5642).
 
 To run the example programs you will need:
 

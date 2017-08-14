@@ -101,13 +101,14 @@ class ArduCAM_Mini {
         bool capturing;
         bool starting;
 
+        virtual void transferQvgaByte(void) = 0;
+
+    private:
+
         ArduCAM_FrameGrabber * grabber;
 
         void grabJpegFrame(uint32_t length);
         void grabQvgaFrame(uint32_t length);
-
-        virtual void transferQvgaByte(void) = 0;
-
 };
 
 class ArduCAM_Mini_5MP : public ArduCAM_Mini
