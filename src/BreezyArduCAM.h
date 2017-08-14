@@ -117,6 +117,13 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
         ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg);
 
         /**
+         * Begins capture in QVGA (raw) mode.
+         * @param scaledown logarithm of 2 by which to scale down image
+         * @param grayscale flag for grayscale conversion
+         */
+        void beginQvga(uint8_t scaledown=0, bool grayscale=false);
+
+        /**
          * Begins 320x240 JPEG capture.
          */
         void beginJpeg320x240(void);
@@ -154,8 +161,6 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
     private:
 
         void beginJpeg(const struct sensor_reg reglist[]);
-
-        void begin(const struct sensor_reg reglist[]);
 };
 
 
@@ -167,17 +172,17 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
     public:
 
         /**
-         * Constructs an ArduCAM_Mini_2MP object.
-         * @param cs pin for Chip Select signal
-         */
-        ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg);
-
-        /**
          * Begins capture in QVGA (raw) mode.
          * @param scaledown logarithm of 2 by which to scale down image
          * @param grayscale flag for grayscale conversion
          */
         void beginQvga(uint8_t scaledown=0, bool grayscale=false);
+
+        /**
+         * Constructs an ArduCAM_Mini_2MP object.
+         * @param cs pin for Chip Select signal
+         */
+        ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg);
 
         /**
          * Begins 160x120 JPEG capture.

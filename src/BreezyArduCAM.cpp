@@ -208,53 +208,24 @@ void ArduCAM_Mini_5MP::beginJpeg(const struct sensor_reg reglist[])
     // Check SPI connection
     spiCheck();
 
-    begin(reglist);
-
-    set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
-    clear_fifo_flag();
-    write_reg(ARDUCHIP_FRAMES, 0x00);
-}
-
-void ArduCAM_Mini_5MP::begin(const struct sensor_reg reglist[])
-{
-
     wrSensorReg16_8(0x3008, 0x80);
     wrSensorRegs16_8(OV5642_QVGA_Preview);
 
     delay(100);
 
-    if (usingJpeg)
-    {
-        delay(100);
-        wrSensorRegs16_8(OV5642_JPEG_Capture_QSXGA);
-        wrSensorRegs16_8(reglist);
-        wrSensorReg16_8(0x3818, 0xa8);
-        wrSensorReg16_8(0x3621, 0x10);
-        wrSensorReg16_8(0x3801, 0xb0);
-        wrSensorReg16_8(0x4407, 0x04);
-    }
-
-    else
-    {
-        byte reg_val;
-        wrSensorReg16_8(0x4740, 0x21);
-        wrSensorReg16_8(0x501e, 0x2a);
-        wrSensorReg16_8(0x5002, 0xf8);
-        wrSensorReg16_8(0x501f, 0x01);
-        wrSensorReg16_8(0x4300, 0x61);
-        rdSensorReg16_8(0x3818, &reg_val);
-        wrSensorReg16_8(0x3818, (reg_val | 0x60) & 0xff);
-        rdSensorReg16_8(0x3621, &reg_val);
-        wrSensorReg16_8(0x3621, reg_val & 0xdf);
-    }
+    wrSensorRegs16_8(OV5642_JPEG_Capture_QSXGA);
+    wrSensorRegs16_8(reglist);
+    wrSensorReg16_8(0x3818, 0xa8);
+    wrSensorReg16_8(0x3621, 0x10);
+    wrSensorReg16_8(0x3801, 0xb0);
+    wrSensorReg16_8(0x4407, 0x04);
 
     capturing = false;
     starting = false;
-}
 
-ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, 0x5FFFF, cs, fg)
-{
-    usingJpeg = false;
+    set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
+    clear_fifo_flag();
+    write_reg(ARDUCHIP_FRAMES, 0x00);
 }
 
 void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown, bool _grayscale)
@@ -264,6 +235,43 @@ void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown, bool _grayscale)
 
     begin();
     wrSensorRegs8_8(OV2640_QVGA);
+}
+
+void ArduCAM_Mini_5MP::beginQvga(uint8_t _scaledown, bool _grayscale)
+{
+    spiCheck();
+
+    scaledown = 1 << _scaledown;
+    grayscale = _grayscale;
+
+    wrSensorReg16_8(0x3008, 0x80);
+    wrSensorRegs16_8(OV5642_QVGA_Preview);
+
+    delay(100);
+
+    byte reg_val;
+    wrSensorReg16_8(0x4740, 0x21);
+    wrSensorReg16_8(0x501e, 0x2a);
+    wrSensorReg16_8(0x5002, 0xf8);
+    wrSensorReg16_8(0x501f, 0x01);
+    wrSensorReg16_8(0x4300, 0x61);
+    rdSensorReg16_8(0x3818, &reg_val);
+    wrSensorReg16_8(0x3818, (reg_val | 0x60) & 0xff);
+    rdSensorReg16_8(0x3621, &reg_val);
+    wrSensorReg16_8(0x3621, reg_val & 0xdf);
+
+    set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
+    clear_fifo_flag();
+    write_reg(ARDUCHIP_FRAMES, 0x00);
+    clear_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
+    wrSensorReg16_8(0x3818, 0x81);
+    wrSensorReg16_8(0x3621, 0xA7);
+}
+
+
+ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, 0x5FFFF, cs, fg)
+{
+    usingJpeg = false;
 }
 
 void ArduCAM_Mini_2MP::beginJpeg160x120(void)
