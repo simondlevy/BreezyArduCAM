@@ -244,22 +244,6 @@ void ArduCAM_Mini_5MP::captureQvga(void)
             else
                 grabQvgaFrame(length);
 
-            /*
-            char VH, VL;
-            int i = 0, j = 0;
-            for (i = 0; i < 240; i++)
-            {
-                for (j = 0; j < 320; j++)
-                {
-                    VH = SPI.transfer(0x00);;
-                    VL = SPI.transfer(0x00);;
-                    Serial.write(VL);
-                    delayMicroseconds(12);
-                    Serial.write(VH);
-                    delayMicroseconds(12);
-                }
-            }
-           */
 
             csHigh();
             clear_fifo_flag();
