@@ -110,18 +110,23 @@ class ArduCAM_Mini {
 
 };
 
+class ArduCAM_Mini_5MP_QVGA : public ArduCAM_Mini
+{
+    public:
+
+        ArduCAM_Mini_5MP_QVGA(int cs);
+
+        void beginQvga(void);
+
+        void capture(void);
+};
+
+
 class ArduCAM_Mini_5MP : public ArduCAM_Mini
 {
     public:
 
         ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg);
-
-        /**
-         * Begins capture in QVGA (raw) mode.
-         * @param scaledown logarithm of 2 by which to scale down image
-         * @param grayscale flag for grayscale conversion
-         */
-        void beginQvga(uint8_t scaledown=0, bool grayscale=false);
 
         /**
          * Begins 320x240 JPEG capture.

@@ -159,6 +159,100 @@ void ArduCAM_Mini::capture(void)
     }
 }
 
+ArduCAM_Mini_5MP_QVGA::ArduCAM_Mini_5MP_QVGA(int CS) : ArduCAM_Mini(0x78, 0, CS, NULL)
+{
+    P_CS  = portOutputRegister(digitalPinToPort(CS));
+    B_CS  = digitalPinToBitMask(CS);
+
+    pinMode(CS, OUTPUT);
+    sbi(P_CS, B_CS);
+    sensor_addr = 0x78;
+}
+
+void ArduCAM_Mini_5MP_QVGA::beginQvga(void)
+{
+    while(1){
+        //Check if the ArduCAM_5MP_QVGA SPI bus is OK
+        write_reg(ARDUCHIP_TEST1, 0x55);
+        if (read_reg(ARDUCHIP_TEST1) != 0x55) {
+            Serial.println(F("ACK CMD SPI interface Error!"));
+            delay(1000);continue;
+        }else{
+            Serial.println(F("ACK CMD SPI interface OK."));break;
+        }
+    }
+
+    wrSensorReg16_8(0x3008, 0x80);
+    wrSensorRegs16_8(OV5642_QVGA_Preview);
+
+    delay(100);
+
+    byte reg_val;
+    wrSensorReg16_8(0x4740, 0x21);
+    wrSensorReg16_8(0x501e, 0x2a);
+    wrSensorReg16_8(0x5002, 0xf8);
+    wrSensorReg16_8(0x501f, 0x01);
+    wrSensorReg16_8(0x4300, 0x61);
+    rdSensorReg16_8(0x3818, &reg_val);
+    wrSensorReg16_8(0x3818, (reg_val | 0x60) & 0xff);
+    rdSensorReg16_8(0x3621, &reg_val);
+    wrSensorReg16_8(0x3621, reg_val & 0xdf);
+
+    set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
+    clear_fifo_flag();
+    write_reg(ARDUCHIP_FRAMES, 0x00);
+    clear_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
+    wrSensorReg16_8(0x3818, 0x81);
+    wrSensorReg16_8(0x3621, 0xA7);
+}
+
+void ArduCAM_Mini_5MP_QVGA::capture(void)
+{
+    if (Serial.available())
+    {
+        Serial.read();
+
+        capturing = true;
+        starting = true;
+
+    }
+
+    else if (capturing)
+    {
+        if (starting)
+        {
+            //Flush the FIFO
+            flush_fifo();
+            clear_fifo_flag();
+            start_capture();
+            starting = false;
+        }
+
+        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
+        {
+            uint32_t length = read_fifo_length();
+            csLow();
+            set_fifo_burst();
+            char VH, VL;
+            int i = 0, j = 0;
+            for (i = 0; i < 240; i++)
+            {
+                for (j = 0; j < 320; j++)
+                {
+                    VH = SPI.transfer(0x00);;
+                    VL = SPI.transfer(0x00);;
+                    Serial.write(VL);
+                    delayMicroseconds(12);
+                    Serial.write(VH);
+                    delayMicroseconds(12);
+                }
+            }
+            csHigh();
+            clear_fifo_flag();
+        }
+    }
+}
+
 
 ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, 0x7FFFF, cs, fg) 
 {
@@ -235,37 +329,6 @@ void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown, bool _grayscale)
 
     begin();
     wrSensorRegs8_8(OV2640_QVGA);
-}
-
-void ArduCAM_Mini_5MP::beginQvga(uint8_t _scaledown, bool _grayscale)
-{
-    spiCheck();
-
-    scaledown = 1 << _scaledown;
-    grayscale = _grayscale;
-
-    wrSensorReg16_8(0x3008, 0x80);
-    wrSensorRegs16_8(OV5642_QVGA_Preview);
-
-    delay(100);
-
-    byte reg_val;
-    wrSensorReg16_8(0x4740, 0x21);
-    wrSensorReg16_8(0x501e, 0x2a);
-    wrSensorReg16_8(0x5002, 0xf8);
-    wrSensorReg16_8(0x501f, 0x01);
-    wrSensorReg16_8(0x4300, 0x61);
-    rdSensorReg16_8(0x3818, &reg_val);
-    wrSensorReg16_8(0x3818, (reg_val | 0x60) & 0xff);
-    rdSensorReg16_8(0x3621, &reg_val);
-    wrSensorReg16_8(0x3621, reg_val & 0xdf);
-
-    set_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
-    clear_fifo_flag();
-    write_reg(ARDUCHIP_FRAMES, 0x00);
-    clear_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
-    wrSensorReg16_8(0x3818, 0x81);
-    wrSensorReg16_8(0x3621, 0xA7);
 }
 
 
