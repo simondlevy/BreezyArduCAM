@@ -146,18 +146,25 @@ void ArduCAM_Mini::capture(void)
 
             csLow();
             set_fifo_burst();
-            //SPI.transfer(0x00);
 
-            if (usingJpeg)
+
+            if (usingJpeg) {
                 grabJpegFrame(length);
-            else
+            }
+            else {
                 grabQvgaFrame(length);
+            }
 
             csHigh();
             clear_fifo_flag();
         }
     }
 }
+
+void ArduCAM_Mini_5MP::transferQvgaByte(void)
+{
+}
+
 
 void ArduCAM_Mini_5MP::beginQvga(uint8_t _scaledown=0, bool _grayscale=false)
 {
@@ -280,6 +287,11 @@ void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown, bool _grayscale)
 }
 
 
+void ArduCAM_Mini_2MP::transferQvgaByte(void)
+{
+    SPI.transfer(0x00);
+}
+
 ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, 0x5FFFF, cs, fg)
 {
     usingJpeg = false;
@@ -361,6 +373,9 @@ void ArduCAM_Mini::grabJpegFrame(uint32_t length)
 
 void ArduCAM_Mini::grabQvgaFrame(uint32_t length)
 {
+    // 2MP requires this
+    transferQvgaByte();
+
     // ignore length and use fixed-size frame
     (void)length;
 

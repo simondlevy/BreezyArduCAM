@@ -106,6 +106,8 @@ class ArduCAM_Mini {
         void grabJpegFrame(uint32_t length);
         void grabQvgaFrame(uint32_t length);
 
+        virtual void transferQvgaByte(void) = 0;
+
 };
 
 class ArduCAM_Mini_5MP : public ArduCAM_Mini
@@ -160,6 +162,10 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
          * Begins 2592x1944 JPEG capture.
          */
         void beginJpeg2592x1944(void);
+
+    protected:
+
+        virtual void transferQvgaByte(void) override;
 
     private:
 
@@ -232,6 +238,10 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
          * Begins 1600x1200 JPEG capture.
          */
         void beginJpeg1600x1200(void);
+
+    protected:
+
+        virtual void transferQvgaByte(void) override;
 
     private:
 
