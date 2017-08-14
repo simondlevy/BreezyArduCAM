@@ -209,11 +209,10 @@ void ArduCAM_Mini_5MP_QVGA::capture(void)
 
     }
 
-    else if (capturing)
-    {
+    if (capturing) {
+
         if (starting)
         {
-            //Flush the FIFO
             flush_fifo();
             clear_fifo_flag();
             start_capture();
