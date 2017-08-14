@@ -101,9 +101,9 @@ class ArduCAM_Mini {
         bool capturing;
         bool starting;
 
-    private:
-
         ArduCAM_FrameGrabber * grabber;
+
+    private:
 
         void grabJpegFrame(uint32_t length);
         void grabQvgaFrame(uint32_t length);
@@ -248,6 +248,7 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
 class ArduCAM_FrameGrabber {
 
     friend class ArduCAM_Mini;
+    friend class ArduCAM_Mini_5MP_QVGA;
 
     protected:
 

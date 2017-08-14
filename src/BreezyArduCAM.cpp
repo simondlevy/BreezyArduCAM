@@ -202,10 +202,8 @@ void ArduCAM_Mini_5MP_QVGA::beginQvga(void)
 
 void ArduCAM_Mini_5MP_QVGA::capture(void)
 {
-    if (Serial.available())
-    {
-        Serial.read();
-
+    // Wait for start bit from host
+    if (grabber->gotStartRequest()) {
         capturing = true;
         starting = true;
 
