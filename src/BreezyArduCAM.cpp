@@ -159,9 +159,13 @@ void ArduCAM_Mini::capture(void)
     }
 }
 
-void ArduCAM_Mini_5MP::beginQvga(void)
+void ArduCAM_Mini_5MP::beginQvga(uint8_t _scaledown=0, bool _grayscale=false)
 {
-    while(1){
+    scaledown = 1 << _scaledown;
+    grayscale = _grayscale;
+
+    // XXX should be possible to use spiCheck() instead
+    while (true ) {
         //Check if the ArduCAM_5MP_QVGA SPI bus is OK
         write_reg(ARDUCHIP_TEST1, 0x55);
         if (read_reg(ARDUCHIP_TEST1) != 0x55) {
@@ -235,6 +239,12 @@ void ArduCAM_Mini_5MP::captureQvga(void)
             csLow();
             set_fifo_burst();
 
+            if (usingJpeg)
+                grabJpegFrame(length);
+            else
+                grabQvgaFrame(length);
+
+            /*
             char VH, VL;
             int i = 0, j = 0;
             for (i = 0; i < 240; i++)
@@ -249,6 +259,8 @@ void ArduCAM_Mini_5MP::captureQvga(void)
                     delayMicroseconds(12);
                 }
             }
+           */
+
             csHigh();
             clear_fifo_flag();
         }
