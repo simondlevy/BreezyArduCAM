@@ -202,56 +202,6 @@ void ArduCAM_Mini_5MP::beginQvga(uint8_t _scaledown=0, bool _grayscale=false)
     usingJpeg = false;
 }
 
-void ArduCAM_Mini_5MP::captureQvga(void)
-{
-    // Wait for start bit from host
-    if (grabber->gotStartRequest()) {
-        capturing = true;
-        starting = true;
-    }
-
-    if (capturing) {
-
-        // Check for halt bit from host
-        if (grabber->gotStopRequest()) {
-            starting = false;
-            capturing = false;
-            return;
-        }
-
-        if (starting) {
-            flush_fifo();
-            clear_fifo_flag();
-            start_capture();
-            starting = false;
-        }
-
-        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
-
-            uint32_t length = read_fifo_length();
-
-            if (length >= max_fifo_size || length == 0) {
-                clear_fifo_flag();
-                starting = true;
-                return;
-            }
-
-            csLow();
-            set_fifo_burst();
-
-            if (usingJpeg)
-                grabJpegFrame(length);
-            else
-                grabQvgaFrame(length);
-
-
-            csHigh();
-            clear_fifo_flag();
-        }
-    }
-}
-
-
 ArduCAM_Mini_5MP::ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, 0x7FFFF, cs, fg) 
 {
 }

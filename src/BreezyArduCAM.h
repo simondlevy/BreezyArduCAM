@@ -121,9 +121,6 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
          */
         void beginQvga(uint8_t scaledown=0, bool grayscale=false);
 
-
-        void captureQvga(void);
-
         /**
          * Begins 320x240 JPEG capture.
          */
