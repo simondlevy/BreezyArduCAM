@@ -161,12 +161,6 @@ void ArduCAM_Mini::capture(void)
 
 ArduCAM_Mini_5MP_QVGA::ArduCAM_Mini_5MP_QVGA(int cs, ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, 0x7FFFF, cs, fg)
 {
-    P_CS  = portOutputRegister(digitalPinToPort(cs));
-    B_CS  = digitalPinToBitMask(cs);
-
-    pinMode(cs, OUTPUT);
-    sbi(P_CS, B_CS);
-    sensor_addr = 0x78;
 }
 
 void ArduCAM_Mini_5MP_QVGA::beginQvga(void)
