@@ -27,7 +27,7 @@ static const int CS = 10;
 
 Serial_ArduCAM_FrameGrabber fg;
 //ArduCAM_Mini_2MP myCam(CS, &fg);
-ArduCAM_Mini_5MP_QVGA myCam(CS);
+ArduCAM_Mini_5MP_QVGA myCam(CS, &fg);
 
 void setup(void) 
 {

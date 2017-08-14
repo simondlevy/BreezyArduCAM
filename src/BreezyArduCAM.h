@@ -114,7 +114,7 @@ class ArduCAM_Mini_5MP_QVGA : public ArduCAM_Mini
 {
     public:
 
-        ArduCAM_Mini_5MP_QVGA(int cs);
+        ArduCAM_Mini_5MP_QVGA(int cs, ArduCAM_FrameGrabber * fg);
 
         void beginQvga(void);
 
