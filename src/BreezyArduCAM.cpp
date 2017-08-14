@@ -228,6 +228,12 @@ void ArduCAM_Mini_5MP_QVGA::capture(void)
 
             uint32_t length = read_fifo_length();
 
+            if (length >= max_fifo_size || length == 0) {
+                clear_fifo_flag();
+                starting = true;
+                return;
+            }
+
             csLow();
             set_fifo_burst();
             char VH, VL;
