@@ -110,23 +110,15 @@ class ArduCAM_Mini {
 
 };
 
-class ArduCAM_Mini_5MP_QVGA : public ArduCAM_Mini
-{
-    public:
-
-        ArduCAM_Mini_5MP_QVGA(int cs, ArduCAM_FrameGrabber * fg);
-
-        void beginQvga(void);
-
-        void capture(void);
-};
-
-
 class ArduCAM_Mini_5MP : public ArduCAM_Mini
 {
     public:
 
         ArduCAM_Mini_5MP(uint8_t cs, class ArduCAM_FrameGrabber * fg);
+
+        void beginQvga(void);
+
+        void captureQvga(void);
 
         /**
          * Begins 320x240 JPEG capture.
@@ -248,7 +240,7 @@ class ArduCAM_Mini_2MP : public ArduCAM_Mini {
 class ArduCAM_FrameGrabber {
 
     friend class ArduCAM_Mini;
-    friend class ArduCAM_Mini_5MP_QVGA;
+    friend class ArduCAM_Mini_5MP;
 
     protected:
 

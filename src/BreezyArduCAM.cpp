@@ -146,7 +146,7 @@ void ArduCAM_Mini::capture(void)
 
             csLow();
             set_fifo_burst();
-            SPI.transfer(0x00);
+            //SPI.transfer(0x00);
 
             if (usingJpeg)
                 grabJpegFrame(length);
@@ -159,11 +159,7 @@ void ArduCAM_Mini::capture(void)
     }
 }
 
-ArduCAM_Mini_5MP_QVGA::ArduCAM_Mini_5MP_QVGA(int cs, ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x78, 0x7FFFF, cs, fg)
-{
-}
-
-void ArduCAM_Mini_5MP_QVGA::beginQvga(void)
+void ArduCAM_Mini_5MP::beginQvga(void)
 {
     while(1){
         //Check if the ArduCAM_5MP_QVGA SPI bus is OK
@@ -198,9 +194,11 @@ void ArduCAM_Mini_5MP_QVGA::beginQvga(void)
     clear_bit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
     wrSensorReg16_8(0x3818, 0x81);
     wrSensorReg16_8(0x3621, 0xA7);
+
+    usingJpeg = false;
 }
 
-void ArduCAM_Mini_5MP_QVGA::capture(void)
+void ArduCAM_Mini_5MP::captureQvga(void)
 {
     // Wait for start bit from host
     if (grabber->gotStartRequest()) {
@@ -236,6 +234,7 @@ void ArduCAM_Mini_5MP_QVGA::capture(void)
 
             csLow();
             set_fifo_burst();
+
             char VH, VL;
             int i = 0, j = 0;
             for (i = 0; i < 240; i++)
