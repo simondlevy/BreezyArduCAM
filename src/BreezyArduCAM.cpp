@@ -206,22 +206,28 @@ void ArduCAM_Mini_5MP_QVGA::capture(void)
     if (grabber->gotStartRequest()) {
         capturing = true;
         starting = true;
-
     }
 
     if (capturing) {
 
-        if (starting)
-        {
+        // Check for halt bit from host
+        if (grabber->gotStopRequest()) {
+            starting = false;
+            capturing = false;
+            return;
+        }
+
+        if (starting) {
             flush_fifo();
             clear_fifo_flag();
             start_capture();
             starting = false;
         }
 
-        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
-        {
+        if (get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+
             uint32_t length = read_fifo_length();
+
             csLow();
             set_fifo_burst();
             char VH, VL;
