@@ -10,6 +10,7 @@ BreezyArduCAM is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
 BreezyArduCAM is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,7 +34,7 @@ PORT = '/dev/ttyACM0' # Ubuntu
 
 SCALEDOWN = 1          # logarithm of 2 (e.g., SCALEDOWN=3 gives 1/8 width, 1/8 height)
 
-BAUD = 921600   # Arduino Uno
+BAUD = 921600   # 115200 for Due
 
 # helpers  --------------------------------------------------------------------------
 
@@ -60,8 +61,8 @@ if __name__ == '__main__':
     # Open connection to Arduino with a timeout of two seconds
     port = serial.Serial(PORT, BAUD, timeout=2)
 
-    # Validate startup message
-    ackcheck(port, 'SPI interface OK.')
+    # Report acknowledgment from camera
+    getack(port)
 
     # Wait a spell
     time.sleep(0.2)

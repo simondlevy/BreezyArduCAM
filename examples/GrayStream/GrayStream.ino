@@ -37,7 +37,7 @@ void setup(void)
     Wire.begin();
     SPI.begin();
 
-    // Talk to Arduino at fastest possible baud rate
+    // For Due use 115200
     Serial.begin(921600);
 
     // Begin capturing in  QVGA mode, scale-down factor 2^2 = 4, grayscale flagged

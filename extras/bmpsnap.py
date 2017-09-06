@@ -78,8 +78,8 @@ if __name__ == '__main__':
 
     dump('Starting capture ...')
 
-    # Validate startup message
-    ackcheck(port, 'SPI interface OK.')
+    # Report acknowledgment from camera
+    getack(port)
 
     # Wait a spell
     time.sleep(0.2)

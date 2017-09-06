@@ -39,8 +39,8 @@ if __name__ == '__main__':
     # Open connection to Arduino with a timeout of two seconds
     port = serial.Serial(PORT, BAUD, timeout=2)
 
-    # Grab and ignore acknowledgment
-    port.readline()
+    # Report acknowledgment from camera
+    getack(port)
 
     # Wait a spell
     time.sleep(0.2)
