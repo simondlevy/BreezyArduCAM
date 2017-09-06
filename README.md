@@ -19,7 +19,7 @@ I have tested this library with ArduCAM Mini 2MP (OV2640) and ArducamMini 5MP Pl
 To run the example programs you will need:
 
 <ul>
-<li> <a href="http://www.arducam.com/tag/arducam-mini">ArduCAM Mini 2MP</a>
+<li> <a href="http://www.arducam.com/tag/arducam-mini">ArduCAM Mini</a>
 <li> Arduino board
 <li> <a href="https://pypi.python.org/pypi/pyserial">pyserial</a>
 <li> OpenCV (for the streaming JPEG example; see note below)

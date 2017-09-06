@@ -26,9 +26,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #if defined (__AVR__)
 #define regtype volatile uint8_t
 #define regsize uint8_t
-#endif
-
-#if defined(__SAM3X8E__)
+#else
 #define regtype volatile uint32_t
 #define regsize uint32_t
 #endif

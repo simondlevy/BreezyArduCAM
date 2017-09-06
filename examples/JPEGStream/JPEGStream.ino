@@ -36,7 +36,7 @@ void setup(void)
     Wire.begin();
     SPI.begin();
 
-    // Talk to Arduino at fastest possible baud rate
+    // Fastest baud rate (change to 115200 for Due)
     Serial.begin(921600);
 
     // Start the camera in JPEG mode with a specific image size

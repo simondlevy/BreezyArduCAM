@@ -29,7 +29,7 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
-BAUD = 921600   # Arduino Uno
+BAUD = 921600       # Change to 115200 for Due
 
 OUTFILENAME = 'test.bmp'
 

@@ -43,9 +43,8 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define fontbyte(x) pgm_read_byte(&cfont.font[x])  
 #define regtype volatile uint8_t
 #define regsize uint8_t
-#endif
 
-#if defined(__SAM3X8E__)
+#else
 
 #define cbi(reg, bitmask) *reg &= ~bitmask
 #define sbi(reg, bitmask) *reg |= bitmask
@@ -166,7 +165,7 @@ void ArduCAM_Mini_5MP::transferQvgaByte(void)
 }
 
 
-void ArduCAM_Mini_5MP::beginQvga(uint8_t _scaledown=0, bool _grayscale=false)
+void ArduCAM_Mini_5MP::beginQvga(uint8_t _scaledown, bool _grayscale)
 {
     scaledown = 1 << _scaledown;
     grayscale = _grayscale;
@@ -439,11 +438,11 @@ void ArduCAM_Mini::spiCheck(void)
         write_reg(ARDUCHIP_TEST1, 0x55);
         uint8_t temp = read_reg(ARDUCHIP_TEST1);
         if (temp != 0x55) {
-            Serial.println("ACK CMD SPI interface Error!");
+            Serial.println(F("ACK CMD SPI interface Error!"));
             delay(1000);
             continue;
-        } else{
-            Serial.println("ACK CMD SPI interface OK.");
+        } else {
+            Serial.println(F("ACK CMD SPI interface OK."));
             break;
         }
     }
@@ -599,9 +598,8 @@ byte ArduCAM_Mini::rdSensorReg8_8(uint8_t regID, uint8_t* regDat)
 // Write 8 bit values to 16 bit register address
 int ArduCAM_Mini::wrSensorRegs16_8(const struct sensor_reg reglist[])
 {
-    int err = 0;
-    unsigned int reg_addr;
-    unsigned char reg_val;
+    unsigned int reg_addr = 0;
+    unsigned char reg_val = 0;
     const struct sensor_reg *next = reglist;
 
     while ((reg_addr != 0xffff) | (reg_val != 0xff))
@@ -609,9 +607,7 @@ int ArduCAM_Mini::wrSensorRegs16_8(const struct sensor_reg reglist[])
 
         reg_addr = pgm_read_word(&next->reg);
         reg_val = pgm_read_word(&next->val);
-        err = wrSensorReg16_8(reg_addr, reg_val);
-        //if (!err)
-        //return err;
+        wrSensorReg16_8(reg_addr, reg_val);
         next++;
     }
     return 1;

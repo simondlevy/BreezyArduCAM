@@ -30,8 +30,7 @@ from helpers import *
 PORT = '/dev/ttyACM0' # Ubuntu
 #PORT = 'COM4'         # Windows
 
-#BAUD = 115200  # Arduino Due
-BAUD = 921600   # Arduino Uno
+BAUD = 921600       # Change to 115200 for Due
 
 # main ------------------------------------------------------------------------------
 
@@ -40,8 +39,8 @@ if __name__ == '__main__':
     # Open connection to Arduino with a timeout of two seconds
     port = serial.Serial(PORT, BAUD, timeout=2)
 
-    # Validate startup message
-    ackcheck(port, 'SPI interface OK.')
+    # Grab and ignore acknowledgment
+    port.readline()
 
     # Wait a spell
     time.sleep(0.2)
@@ -84,7 +83,10 @@ if __name__ == '__main__':
                 if ord(currbyte) == 0xd9 and ord(prevbyte) == 0xff:
                     tmpfile.close()
                     img = cv2.imread("tmp.jpg")
-                    cv2.imshow("ArduCAM [ESC to quit]", img)
+                    try:
+                        cv2.imshow("ArduCAM [ESC to quit]", img)
+                    except:
+                        pass
                     if cv2.waitKey(1) == 27:
                         done = True
                         break

@@ -28,8 +28,8 @@ static const int CS = 10;
 Serial_ArduCAM_FrameGrabber fg;
 
 /* Choose your camera */
-//ArduCAM_Mini_2MP myCam(CS, &fg);
-ArduCAM_Mini_5MP myCam(CS, &fg);
+ArduCAM_Mini_2MP myCam(CS, &fg);
+//ArduCAM_Mini_5MP myCam(CS, &fg);
 
 void setup(void) 
 {
@@ -37,7 +37,7 @@ void setup(void)
     Wire.begin();
     SPI.begin();
 
-    // Talk to Arduino at fastest possible baud rate
+    // Fastest baud rate (change to 115200 for Due)
     Serial.begin(921600);
 
     // Begin capturing in  QVGA mode
