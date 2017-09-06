@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # Send "start capture" message
     sendbyte(port, 1)
 
-    dump('\nWriting file %s (will appear upside-down) ...' % OUTFILENAME)
+    dump('\nWriting file %s (may appear upside-down) ...' % OUTFILENAME)
 
     # Open output file
     outfile = open(OUTFILENAME, 'wb')
