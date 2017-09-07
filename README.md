@@ -7,7 +7,7 @@ I've taken the code in the original ArduCAM Arduino [repository](https://github.
 and simplified the API, so you can write new applications with a minimal amount of effort.  
 
 As you can see in this 
-<a href="https://github.com/simondlevy/BreezyArduCAM/blob/master/examples/JPEGStream/JPEGStream.ino#L27-L45">
+<a href="https://github.com/simondlevy/BreezyArduCAM/blob/master/examples/JPEGStream/JPEGStream.ino#L29-L49">
 example</a>,
 you just call a constructor method, a begin method, and a capture method.
 Each example
