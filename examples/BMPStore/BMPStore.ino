@@ -39,116 +39,114 @@ See: https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png
  */
 static const uint8_t HDRSIZE = 66;
 static const uint8_t bmp_header[HDRSIZE] = {
-	0x42, 0x4D,             // signature, must be 4D42 hex
-	0x36, 0x58, 0x02, 0x00, // size of BMP file in bytes (unreliable)
-	0x00, 0x00,             // reserved, must be zero
-	0x00, 0x00,             // reserved, must be zero
-	0x42, 0x00, 0x00, 0x00, // offset to start of image data in bytes
-	0x28, 0x00, 0x00, 0x00, // size of BITMAPINFOHEADER structure, must be 40
-	0x40, 0x01, 0x00, 0x00, // image width in pixels
-	0xF0, 0x00, 0x00, 0x00, // image height in pixels
-	0x01, 0x00,             // number of planes in the image, must be 1
-	0x10, 0x00,             // number of bits per pixel
-	0x03, 0x00, 0x00, 0x00, // compression type
-	0x00, 0x58, 0x02, 0x00, // size of image data in bytes (including padding)
-	0xC4, 0x0E, 0x00, 0x00, // horizontal resolution in pixels per meter (unreliable)
-	0xC4, 0x0E, 0x00, 0x00, // vertical resolution in pixels per meter (unreliable)
-	0x00, 0x00, 0x00, 0x00, // number of colors in image, or zero
-	0x00, 0x00, 0x00, 0x00, // number of important colors, or zero
-	0x00, 0xF8, 0x00, 0x00, // red channel bitmask
-	0xE0, 0x07, 0x00, 0x00, // green channel bitmask
-	0x1F, 0x00, 0x00, 0x00  // blue channel bitmask
+    0x42, 0x4D,             // signature, must be 4D42 hex
+    0x36, 0x58, 0x02, 0x00, // size of BMP file in bytes (unreliable)
+    0x00, 0x00,             // reserved, must be zero
+    0x00, 0x00,             // reserved, must be zero
+    0x42, 0x00, 0x00, 0x00, // offset to start of image data in bytes
+    0x28, 0x00, 0x00, 0x00, // size of BITMAPINFOHEADER structure, must be 40
+    0x40, 0x01, 0x00, 0x00, // image width in pixels
+    0xF0, 0x00, 0x00, 0x00, // image height in pixels
+    0x01, 0x00,             // number of planes in the image, must be 1
+    0x10, 0x00,             // number of bits per pixel
+    0x03, 0x00, 0x00, 0x00, // compression type
+    0x00, 0x58, 0x02, 0x00, // size of image data in bytes (including padding)
+    0xC4, 0x0E, 0x00, 0x00, // horizontal resolution in pixels per meter (unreliable)
+    0xC4, 0x0E, 0x00, 0x00, // vertical resolution in pixels per meter (unreliable)
+    0x00, 0x00, 0x00, 0x00, // number of colors in image, or zero
+    0x00, 0x00, 0x00, 0x00, // number of important colors, or zero
+    0x00, 0xF8, 0x00, 0x00, // red channel bitmask
+    0xE0, 0x07, 0x00, 0x00, // green channel bitmask
+    0x1F, 0x00, 0x00, 0x00  // blue channel bitmask
 };
 
 File file;
 
 class FlashRAM_FrameGrabber : public ArduCAM_FrameGrabber {
 
-	private:
+    private:
 
-		bool done;
+        bool done;
 
-	public:
+    public:
 
-		FlashRAM_FrameGrabber(void)
-		{
-			done = false;
-		}
+        FlashRAM_FrameGrabber(void)
+        {
+            done = false;
+        }
 
-	protected:
+    protected:
 
-		/**
-		 * Implements the gotStartRequest() method by checking whether we've written the file yet
-		 */
-		virtual bool gotStartRequest(void) override 
-		{
-			return !done;
-		}
+        /**
+         * Implements the gotStartRequest() method by checking whether we've written the file yet
+         */
+        virtual bool gotStartRequest(void) override 
+        {
+            return !done;
+        }
 
-		/**
-		 * Implements the gotStopRequest() method by checking whether we've written the file yet
-		 */
-		virtual bool gotStopRequest(void) override 
-		{
+        /**
+         * Implements the gotStopRequest() method by checking whether we've written the file yet
+         */
+        virtual bool gotStopRequest(void) override 
+        {
 
-                        if (done) {
-                            file.close();
-                            DOSFS.end();
-                        }
+            if (done) {
+                file.close();
+                DOSFS.end();
+            }
 
-			return done;
-		}
+            return done;
+        }
 
-		/**
-		 * Implements the sencByte() method by writing the byte to a file.
-		 * @param b the byte to send
-		 */
-		virtual void sendByte(uint8_t b) override 
-		{
-                        // Write the byte to the file
-			file.write(b);
+        /**
+         * Implements the sencByte() method by writing the byte to a file.
+         * @param b the byte to send
+         */
+        virtual void sendByte(uint8_t b) override 
+        {
+            // Write the byte to the file
+            file.write(b);
 
-			// As soon as we've handled the first byte, we know we'll capture the whole frame
-			done = true; 
-		}
+            // As soon as we've handled the first byte, we know we'll capture the whole frame
+            done = true; 
+        }
 };
 
 FlashRAM_FrameGrabber fg;
 
-/* Choose your camera */
+// Choose your camera 
 //ArduCAM_Mini_2MP myCam(CS, &fg);
 ArduCAM_Mini_5MP myCam(CS, &fg);
 
 void setup(void) 
 {
-	Serial.begin(115200);
+    // Enable file interaction
+    DOSFS.begin();
 
-	// Enable file interaction
-	DOSFS.begin();
+    // Delete the old file if it exists
+    if (DOSFS.exists(FILENAME)) { 
+        DOSFS.remove(FILENAME);
+    }
 
-        // Delete the old file if it exists
-        if (DOSFS.exists(FILENAME)) { 
-            DOSFS.remove(FILENAME);
-        }
+    // Open the file for writing, creating it
+    file = DOSFS.open(FILENAME, "w");
 
-	// Open the file for writing, creating it
-	file = DOSFS.open(FILENAME, "w");
+    // Write the BMP header to the file
+    for (int k=0; k<HDRSIZE; ++k) {
+        file.write(bmp_header[k]);
+    }
 
-        // Write the BMP header to the file
-        for (int k=0; k<HDRSIZE; ++k) {
-            file.write(bmp_header[k]);
-        }
+    // ArduCAM Mini uses both I^2C and SPI buses
+    Wire.begin();
+    SPI.begin();
 
-	// ArduCAM Mini uses both I^2C and SPI buses
-	Wire.begin();
-	SPI.begin();
-
-	// Begin capturing in  QVGA mode
-	myCam.beginQvga();
+    // Begin capturing in  QVGA mode
+    myCam.beginQvga();
 
 }
 
 void loop(void) 
 {
-	myCam.capture();
+    myCam.capture();
 }
