@@ -26,8 +26,8 @@ from helpers import *
 
 # Modifiable params -------------------------------------------------------------------
 
-PORT = '/dev/ttyACM0' # Ubuntu
-#PORT = 'COM4'         # Windows
+#PORT = '/dev/ttyACM0' # Ubuntu
+PORT = 'COM9'         # Windows
 
 BAUD = 921600       # Change to 115200 for Due
 
@@ -42,7 +42,7 @@ def dump(msg):
     stdout.write(msg)
     stdout.flush()
 
-# BMP header for 320x240 imagel ------------------------------------------------------
+# BMP header for 320x240 image ------------------------------------------------------
 #
 # See: http://www.fastgraph.com/help/bmp_header_format.html
 # See: https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png

@@ -111,6 +111,7 @@ ArduCAM_Mini::ArduCAM_Mini(uint8_t addr, uint32_t mfs, uint8_t cs, class ArduCAM
 
 void ArduCAM_Mini::capture(void)
 {
+
     // Wait for start bit from host
     if (grabber->gotStartRequest()) {
         capturing = true;
@@ -127,6 +128,7 @@ void ArduCAM_Mini::capture(void)
         }
 
         if (starting) {
+
             flush_fifo();
             clear_fifo_flag();
             start_capture();
