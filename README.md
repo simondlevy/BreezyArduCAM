@@ -31,7 +31,7 @@ Pay special attention to the <b>CS</b> pin, which you'll have to
 [change](http://www.arducam.com/wp-content/uploads/2017/06/cs.jpg) in the Arduino
 sketch to match the wiring in the tutorial.
 
-As usual, you should copy the library folder (<b>arduino/BreezyArduCAM</b>) into your Arduino libraries folder.
+As usual with Arduino, you should clone this repository into your Arduino libraries folder.
 Then launch the Arduino IDE and go to <b>File/Examples/BreezyArduCAM</b>) to upload an example sketch.
 
 Once you've wired up the camera and loaded the sketch onto your Arduino, edit the <b>PORT</b> variable
