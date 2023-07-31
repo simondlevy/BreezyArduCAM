@@ -26,7 +26,7 @@ To run the example programs you will need:
 </ul>
 
 If (like me) you use an ordinary Arduino board without the ArduCAM Shield you can use the ArduCAM 
-[tutorial](http://www.arducam.com/knowledge-base/category/tutorial/arduino/) to set up your camera.
+[tutorial](https://www.arducam.com/knowledge-base/mini-tutorial/) to set up your camera.
 Pay special attention to the <b>CS</b> pin, which you'll have to 
 [change](http://www.arducam.com/wp-content/uploads/2017/06/cs.jpg) in the Arduino
 sketch to match the wiring in the tutorial.
